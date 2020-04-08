@@ -7,7 +7,7 @@ class AnimatedStatus {
 	}
 
 	getVersion () {
-		return "0.8.4";
+		return "0.9.0";
 	}
 
 	getAuthor () {
@@ -96,7 +96,7 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newLabel('Animation ("" for no Emoji)'));
 		let animation = GUI.newTextarea();
 		animation.style.fontFamily = "SourceCodePro,Consolas,Liberation Mono,Menlo,Courier,monospace";
-		animation.placeholder = '"Message 1", "Emoji 1"\n"Message 2", ""\n...';
+		animation.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n...';
 		animation.value = this.animationToStr(this.getData("animation"));
 		settings.appendChild(animation);
 
@@ -137,7 +137,14 @@ const Status = {
 	},
 
 	set: (status) => {
-		Status.request().send('{"custom_status":{"text":"' + status[0] + '", "emoji_name": "' + status[1] + '"}}');
+		let data = {};
+
+		if (status.length == 0) return;
+		if (status.length >= 1) data.text = status[0];
+		if (status.length >= 2) data.emoji_name = status[1];
+		if (status.length >= 3) data.emoji_id = status[2];
+
+		Status.request().send(JSON.stringify({custom_status: data}));
 	},
 
 	unset: () => {
