@@ -7,7 +7,7 @@ class AnimatedStatus {
 	}
 
 	getVersion () {
-		return "0.9.1";
+		return "0.9.2";
 	}
 
 	getAuthor () {
@@ -112,6 +112,9 @@ class AnimatedStatus {
 
 			// Set Animation
 			this.setData("animation", this.strToAnimation(animation.value));
+			
+			// Show Toast
+			BdApi.showToast("Settings were saved!", {type: "success"});
 
 			this.stop();
 			this.load();
