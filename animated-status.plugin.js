@@ -7,7 +7,7 @@ class AnimatedStatus {
 	}
 
 	getVersion () {
-		return "0.9.0";
+		return "0.9.1";
 	}
 
 	getAuthor () {
@@ -85,7 +85,7 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newDivider());
 
 		// timeout
-		settings.appendChild(GUI.newLabel("Time per Keyframe"));
+		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
 		let timeout = GUI.newInput();
 		timeout.value = this.getData("timeout");
 		settings.appendChild(timeout);
