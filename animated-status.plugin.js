@@ -7,7 +7,7 @@ class AnimatedStatus {
 	}
 
 	getVersion () {
-		return "0.9.2";
+		return "0.10.0";
 	}
 
 	getAuthor () {
@@ -143,7 +143,10 @@ const Status = {
 		let data = {};
 
 		if (status.length == 0) return;
-		if (status.length >= 1) data.text = status[0];
+		if (status.length >= 1)
+			data.text = status[0].startsWith("eval ") ?
+			            eval(status[0].substr(5)) :
+			            status[0];
 		if (status.length >= 2) data.emoji_name = status[1];
 		if (status.length >= 3) data.emoji_id = status[2];
 
