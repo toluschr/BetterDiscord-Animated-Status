@@ -96,7 +96,7 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newLabel('Animation'));
 		let animation = GUI.newTextarea();
 		animation.style.fontFamily = "SourceCodePro,Consolas,Liberation Mono,Menlo,Courier,monospace";
-		animation.placeholder = '"eval new String(\'test\') (Javascript)"\n"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n...';
+		animation.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n"eval new String(\'test\') (Javascript)"\n"eval new String(\'test\') (Javascript)", "👍 (Symbol)"\n...';
 		animation.value = this.animationToStr(this.getData("animation"));
 		settings.appendChild(animation);
 
