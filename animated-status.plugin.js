@@ -45,7 +45,7 @@ class AnimatedStatus {
 
 	Status_Animate (index = 0) {
 		if (index >= this.animation.length) index = 0;
-	
+
 		Status.set(this.animation[index]);
 		this.loop = setTimeout(() => { this.Status_Animate(index + 1); }, this.timeout);
 	}
