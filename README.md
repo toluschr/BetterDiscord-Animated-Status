@@ -12,6 +12,7 @@ Open Discord, go to Settings\>Plugins, enable AnimatedStatus and click on Settin
 Enter the required information into the input fields and click `save`
 
 ## Animations
+![Settings Page](/screenshots/settings.png?raw=true)
 Animations are made in a really simple and easy to understand syntax.
 ```
 "Test (Message)"
@@ -22,4 +23,8 @@ Animations are made in a really simple and easy to understand syntax.
 ...
 ```
 
-![Settings Page](/screenshots/settings.png?raw=true)
+## Examples
+Have the current time as your status:
+```
+"eval (function(){let fmt=(t)=>(t<10?'0':'')+t;let d=new Date();return fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());})();"
+```
