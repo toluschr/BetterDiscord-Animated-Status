@@ -43,7 +43,7 @@ class AnimatedStatus {
 		Status.unset();
 	}
 
-	Status_Eval (string) {
+	async Status_Eval (string) {
 		try {
 			return ((string.startsWith("eval ")) ? (eval(string.substr(5))) : (string));
 		}
@@ -56,8 +56,11 @@ class AnimatedStatus {
 	Status_Animate (index = 0) {
 		if (index >= this.animation.length) index = 0;
 
-		Status.set(this.animation[index].map(element => this.Status_Eval(element)));
-		this.loop = setTimeout(() => { this.Status_Animate(index + 1); }, this.timeout);
+		let results = this.animation[index].map(async (element) => this.Status_Eval(element));
+		Promise.all(results).then(res => {
+			Status.set(res)
+			this.loop = setTimeout(() => { this.Status_Animate(index + 1); }, this.timeout);
+		});
 	}
 
 	/* Settings related functions */
