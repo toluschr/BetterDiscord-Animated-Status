@@ -43,10 +43,20 @@ class AnimatedStatus {
 		Status.unset();
 	}
 
+	Status_Eval (string) {
+		try {
+			return ((string.startsWith("eval ")) ? (eval(string.substr(5))) : (string));
+		}
+		catch (e) {
+			BdApi.showToast(e, {type: "error"});
+			return "";
+		}
+	}
+
 	Status_Animate (index = 0) {
 		if (index >= this.animation.length) index = 0;
 
-		Status.set(this.animation[index]);
+		Status.set(this.animation[index].map(element => this.Status_Eval(element)));
 		this.loop = setTimeout(() => { this.Status_Animate(index + 1); }, this.timeout);
 	}
 
@@ -96,7 +106,7 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newLabel('Animation'));
 		let animation = GUI.newTextarea();
 		animation.style.fontFamily = "SourceCodePro,Consolas,Liberation Mono,Menlo,Courier,monospace";
-		animation.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n"eval new String(\'test\') (Javascript)"\n"eval new String(\'test\') (Javascript)", "👍 (Symbol)"\n...';
+		animation.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n"eval new String(\'test\') (Javascript)"\n"eval new String(\'test\') (Javascript)", "eval new String(\'👍\') (Javascript)"\n...';
 		animation.value = this.animationToStr(this.getData("animation"));
 		settings.appendChild(animation);
 
@@ -131,16 +141,6 @@ class AnimatedStatus {
 const Status = {
 	authToken: "",
 
-	formatString: (str) => {
-		try {
-			return str.startsWith("eval ") ? eval(str.substr(5)) : str;
-		}
-		catch (e) {
-			BdApi.showToast("Error in custom Javascript!", {type: "error"});
-			return "";
-		}
-	},
-
 	request: () => {
 		let req = new XMLHttpRequest();
 		req.open("PATCH", "/api/v6/users/@me/settings", true);
@@ -153,7 +153,7 @@ const Status = {
 		let data = {};
 
 		if (status.length == 0) return;
-		if (status.length >= 1) data.text = Status.formatString(status[0]);
+		if (status.length >= 1) data.text = status[0];
 		if (status.length >= 2) data.emoji_name = status[1];
 		if (status.length >= 3) data.emoji_id = status[2];
 
