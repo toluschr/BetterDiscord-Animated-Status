@@ -114,15 +114,21 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newDivider());
 		let save = GUI.newButton("Save");
 		save.onclick = () => {
-			// Set Auth token
-			this.setData("token", token.value);
+			try {
+				// Set Auth token
+				this.setData("token", token.value);
 
-			// Set timeout
-			this.setData("timeout", timeout.value);
+				// Set timeout
+				this.setData("timeout", timeout.value);
 
-			// Set Animation
-			this.setData("animation", this.strToAnimation(animation.value));
-			
+				// Set Animation
+				this.setData("animation", this.strToAnimation(animation.value));
+			}
+			catch (e) {
+				BdApi.showToast(e, {type: "error"});
+				return;
+			}
+
 			// Show Toast
 			BdApi.showToast("Settings were saved!", {type: "success"});
 
