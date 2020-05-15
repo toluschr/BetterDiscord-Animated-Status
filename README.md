@@ -25,10 +25,10 @@ Animations are made in a really simple and easy to understand syntax.
 ## Examples
 Have the current time as your status:
 ```
-"eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());"
+"eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;"
 ```
 
 Have the current time with the corresponding clock symbol as your current status
 ```
-"eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();fmt(d.getHours())+':'+fmt(d.getMinutes())+':'+fmt(d.getSeconds());", "eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)];"
+"eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;", "eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)];"
 ```
