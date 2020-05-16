@@ -7,7 +7,7 @@ class AnimatedStatus {
 	}
 
 	getVersion () {
-		return "0.10.0";
+		return "0.10.1";
 	}
 
 	getAuthor () {
