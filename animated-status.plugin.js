@@ -43,7 +43,7 @@ class AnimatedStatus {
 		Status.unset();
 	}
 
-	async Status_Eval (string) {
+	Status_Eval (string) {
 		try {
 			return ((string.startsWith("eval ")) ? (eval(string.substr(5))) : (string));
 		}
