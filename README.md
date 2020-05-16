@@ -36,6 +36,7 @@ Have the current time as your status:
 ```
 
 Have the current time with the corresponding clock symbol as your current status
+![Settings Page](/screenshots/status_clock.png?raw=true)\
 ```
 "eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;", "eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)];"
 ```
