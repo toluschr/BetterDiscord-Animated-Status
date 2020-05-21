@@ -20,7 +20,7 @@ Example: With a timeout of 2000, the following animation would take 4 seconds to
 ```
 The animation timeout should be at least 2900 milliseconds for the animation to look smooth on other clients. This maked sure no keyframe gets gets lost.
 On mobile systems the timeout might have to be set a little higher (10-14 Seconds)\
-^ According to @pintoso (#4)
+^ According to [@pintoso](https://github.com/pintoso)
 
 
 ## Animations
