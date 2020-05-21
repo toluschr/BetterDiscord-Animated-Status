@@ -11,6 +11,18 @@ Linux: `~/.config/BetterDiscord/plugins`
 Open Discord, go to Settings\>Plugins, enable AnimatedStatus and click on Settings.\
 Enter the required information into the input fields and click `save`
 
+## Timeout / Time Per Keyframe
+The value specifies the length of each animation step in milliseconds.
+Example: With a timeout of 2000, the following animation would take 4 seconds to complete
+```
+"abc"
+"def"
+```
+The animation timeout should be at least 2900 milliseconds for the animation to look smooth on other clients. This maked sure no keyframe gets gets lost.
+On mobile systems the timeout might have to be set a little higher (10-14 Seconds)\
+^ According to @pintoso (#4)
+
+
 ## Animations
 ![Settings Page](/screenshots/settings.png?raw=true)\
 Animations are made in a really simple and easy to understand syntax.
