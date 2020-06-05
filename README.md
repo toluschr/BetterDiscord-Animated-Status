@@ -5,7 +5,7 @@
 * [Installation](#installation)
 * [Usage](#usage)
 * [Timeout / Time Per Keyframe](#timeout--time-per-keyframe)
-* [The 'rich' vs 'raw' editor](#the-rich-vs-raw-editor)
+* ['rich' vs 'raw' editor](#rich-vs-raw-editor)
 * [Animations](#animations)
 * [Examples](#examples)
 	* [Custom Javascript](#custom-javascript)
@@ -34,9 +34,9 @@ The animation timeout should be at least 2900 milliseconds for the animation to 
 On mobile systems the timeout might have to be set a little higher (10-14 Seconds)\
 ^ According to [@pintoso](https://github.com/pintoso)
 
-## The 'rich' vs 'raw' editor
+## 'rich' vs 'raw' editor
 Since the lastest version, the plugin now features a new rich editor. It doesn't add functionality, but makes editing your animations a whole lot easier!\
-![Rich Editor](/screenshots/rich.png?raw=true)
+![Rich Editor](/screenshots/rich.png?raw=true)\
 The raw editor is just a text input field, where you can edit your animations manually in a json-like format\
 (looking at the source code reveals that it's basically json with missing brackets)
 
