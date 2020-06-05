@@ -219,15 +219,20 @@ class AnimatedStatus {
 		changeEditMode.onclick = () => {
 			let remove = undefined, append = undefined;
 
-			if (preferredEditor == "rich") {
-				animation = this.newRawEdit(this.jsonToStr(this.richEditToJson(editor)));
-				[remove, append] = [editor, animation];
-				actionsRich.style.display = "none";
+			try {
+				if (preferredEditor == "rich") {
+					animation = this.newRawEdit(this.jsonToStr(this.richEditToJson(editor)));
+					[remove, append] = [editor, animation];
+					actionsRich.style.display = "none";
+				}
+				else {
+					editor = this.jsonToRichEdit(this.strToJson(animation.value));
+					[remove, append] = [animation, editor];
+					actionsRich.style.display = "flex";
+				}
 			}
-			else {
-				editor = this.jsonToRichEdit(this.strToJson(animation.value));
-				[remove, append] = [animation, editor];
-				actionsRich.style.display = "flex";
+			catch (e) {
+				BdApi.showToast(e, {type: "error"})
 			}
 
 			// TODO Consider making this an integer
