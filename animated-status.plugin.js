@@ -134,7 +134,7 @@ class AnimatedStatus {
 		return out;
 	}
 
-	editorToJson (editor) {
+	richEditToJson (editor) {
 		return Array.prototype.slice.call(editor.childNodes).filter(e => (!e.hasAttribute("divider"))).map((element) => {
 			return Array.prototype.slice.call(element.childNodes).filter(e => (!e.hasAttribute("divider") && e.value.length)).map(e => e.value);
 		});
@@ -220,7 +220,7 @@ class AnimatedStatus {
 			let remove = undefined, append = undefined;
 
 			if (preferredEditor == "rich") {
-				animation = this.newRawEdit(this.jsonToStr(this.editorToJson(editor)));
+				animation = this.newRawEdit(this.jsonToStr(this.richEditToJson(editor)));
 				[remove, append] = [editor, animation];
 				actionsRich.style.display = "none";
 			}
@@ -261,7 +261,7 @@ class AnimatedStatus {
 
 				// Set Animation
 				if (preferredEditor == "rich")
-					this.setData("animation", this.editorToJson(editor));
+					this.setData("animation", this.richEditToJson(editor));
 				else
 					this.setData("animation", this.strToJson(animation.value));
 			}
