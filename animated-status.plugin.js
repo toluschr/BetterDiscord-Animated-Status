@@ -55,6 +55,10 @@ class AnimatedStatus {
 
 	Status_Animate (index = 0) {
 		if (index >= this.animation.length) index = 0;
+		if (this.animation[index] == undefined) {
+			BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
+			return;
+		}
 
 		let results = this.animation[index].map(async (element) => this.Status_Eval(element));
 		Promise.all(results).then(res => {
