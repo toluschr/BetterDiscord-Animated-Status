@@ -35,7 +35,7 @@ On mobile systems the timeout might have to be set a little higher (10-14 Second
 ^ According to [@pintoso](https://github.com/pintoso)
 
 ## The 'rich' vs 'raw' editor
-Since the lastest version, the plugin now features a new rich editor. It doesn't add functionality, but makes editing your animations a whole lot easier!
+Since the lastest version, the plugin now features a new rich editor. It doesn't add functionality, but makes editing your animations a whole lot easier!\
 ![Rich Editor](/screenshots/rich.png?raw=true)
 The raw editor is just a text input field, where you can edit your animations manually in a json-like format\
 (looking at the source code reveals that it's basically json with missing brackets)
