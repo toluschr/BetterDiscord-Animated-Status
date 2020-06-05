@@ -115,7 +115,7 @@ class AnimatedStatus {
 
 		// Save Button
 		settings.appendChild(GUI.newDivider());
-		let save = GUI.newButton("Save");
+		let save = GUI.setSuggested(GUI.newButton("Save"), true);
 		save.onclick = () => {
 			try {
 				// Set Auth token
@@ -208,5 +208,12 @@ const GUI = {
 		button.className = "button-38aScr lookFilled-1Gx00P colorBrand-3pXr91 sizeSmall-2cSMqn"; 
 		button.innerText = text;
 		return button;
+	},
+
+	setSuggested: (element, value) => {
+		if (value) element.classList.add("colorGreen-29iAKY");
+		else element.classList.remove("mystyle");
+		// Chain call
+		return element;
 	}
 };
