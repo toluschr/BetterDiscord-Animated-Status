@@ -104,6 +104,7 @@ class AnimatedStatus {
 		// timeout
 		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
 		let timeout = GUI.newInput();
+		timeout.setAttribute("type", "number");
 		timeout.value = this.getData("timeout");
 		settings.appendChild(timeout);
 
