@@ -119,7 +119,7 @@ class AnimatedStatus {
 	}
 
 	jsonToRichEdit (json) {
-		let out = GUI.newDiv();
+		let out = document.createElement("div");
 		for (let i = 0; i < json.length; i++) {
 			// text is 0, emoji is 1
 			let row = undefined;
@@ -142,7 +142,7 @@ class AnimatedStatus {
 
 	// Settings
 	getSettingsPanel () {
-		let settings = GUI.newDiv();
+		let settings = document.createElement("div");
 		settings.style.padding = "10px";
 
 		// Auth token
@@ -164,7 +164,7 @@ class AnimatedStatus {
 
 		// Animation
 		settings.appendChild(GUI.newLabel('Animation'));
-		let animationContainer = GUI.newDiv();
+		let animationContainer = document.createElement("div");
 		settings.appendChild(animationContainer);
 
 		// Actions
@@ -326,10 +326,6 @@ const GUI = {
 		label.className = "h5-18_1nd";
 		label.innerText = text;
 		return label;
-	},
-
-	newDiv: () => {
-		return document.createElement("div");
 	},
 
 	// TODO: consider using margin / padding over minheight and width (or the appropriate html element)
