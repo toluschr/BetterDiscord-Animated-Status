@@ -78,6 +78,7 @@ class AnimatedStatus {
 
 	newRichRow (text, emoji, optNitroId = undefined) {
 		let hbox = GUI.newHBox();
+		hbox.setAttribute("type", "rich-row");
 
 		let textWidget = GUI.newInput(text);
 		textWidget.placeholder = "Text";
@@ -135,8 +136,8 @@ class AnimatedStatus {
 	}
 
 	richEditToJson (editor) {
-		return Array.prototype.slice.call(editor.childNodes).filter(e => (!e.hasAttribute("divider"))).map((element) => {
-			return Array.prototype.slice.call(element.childNodes).filter(e => (!e.hasAttribute("divider") && e.value.length)).map(e => e.value);
+		return Array.prototype.slice.call(editor.childNodes).filter(e => ((e.getAttribute("type") != "divider"))).map((element) => {
+			return Array.prototype.slice.call(element.childNodes).filter(e => ((e.getAttribute("type") != "divider") && e.value.length)).map(e => e.value);
 		});
 	}
 
@@ -338,7 +339,7 @@ const GUI = {
 	// TODO: consider using margin / padding over minheight and width (or the appropriate html element)
 	newDivider: (size = "15px") => {
 		let divider = document.createElement("div");
-		divider.setAttribute("divider", "");
+		divider.setAttribute("type", "divider");
 		divider.style.minHeight = size;
 		divider.style.minWidth = size;
 		return divider;
