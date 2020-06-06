@@ -136,9 +136,12 @@ class AnimatedStatus {
 	}
 
 	richEditToJson (editor) {
-		return Array.prototype.slice.call(editor.childNodes).filter(e => ((e.getAttribute("type") != "divider"))).map((element) => {
-			return Array.prototype.slice.call(element.childNodes).filter(e => ((e.getAttribute("type") != "divider") && e.value.length)).map(e => e.value);
-		});
+		return Array.prototype.slice.call(editor.childNodes)
+			.filter(e => ((e.getAttribute("type") != "divider"))).map((element) => {
+				return Array.prototype.slice.call(element.childNodes)
+					.filter(e => ((e.getAttribute("type") != "divider") && e.value.length))
+					.map(e => e.value);
+		}).filter(e => e.length);
 	}
 
 	// Settings
