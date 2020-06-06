@@ -233,6 +233,8 @@ class AnimatedStatus {
 			}
 			catch (e) {
 				BdApi.showToast(e, {type: "error"})
+				// Don't try to change the type
+				return;
 			}
 
 			// TODO Consider making this an integer
