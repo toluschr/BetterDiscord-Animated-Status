@@ -78,22 +78,23 @@ class AnimatedStatus {
 
 	newRichRow (text, emoji, optNitroId = undefined) {
 		let hbox = GUI.newHBox();
-		hbox.setAttribute("type", "rich-row");
 
 		let textWidget = GUI.newInput(text);
 		textWidget.placeholder = "Text";
+		textWidget.style.marginRight = "15px";
 		if (text != undefined) textWidget.value = text;
 		hbox.appendChild(textWidget);
 
-		hbox.appendChild(GUI.newDivider());
+		// hbox.appendChild(GUI.newDivider());
 
 		let emojiWidget = GUI.newInput(emoji);
 		emojiWidget.placeholder = "👍 / nitro_name";
 		emojiWidget.style.width = "140px";
+		emojiWidget.style.marginRight = "15px";
 		if (emoji != undefined) emojiWidget.value = emoji;
 		hbox.appendChild(emojiWidget);
 
-		hbox.appendChild(GUI.newDivider());
+		//hbox.appendChild(GUI.newDivider());
 
 		let optNitroIdWidget = GUI.newInput(optNitroId);
 		optNitroIdWidget.placeholder = "(optional) nitro_id";
@@ -127,8 +128,7 @@ class AnimatedStatus {
 			if (json[i].length == 2) row = this.newRichRow(json[i][0], json[i][1]);
 			else row = this.newRichRow(json[i][0], json[i][1], json[i][2]);
 
-			// Don't add divider to first row
-			if (i != 0) out.appendChild(GUI.newDivider());
+			if (i) row.style.marginTop = "15px";
 			out.appendChild(row);
 		}
 
@@ -136,10 +136,9 @@ class AnimatedStatus {
 	}
 
 	richEditToJson (editor) {
-		return Array.prototype.slice.call(editor.childNodes)
-			.filter(e => ((e.getAttribute("type") != "divider"))).map((element) => {
+		return Array.prototype.slice.call(editor.childNodes).map((element) => {
 				return Array.prototype.slice.call(element.childNodes)
-					.filter(e => ((e.getAttribute("type") != "divider") && e.value.length))
+					.filter(e => e.value.length)
 					.map(e => e.value);
 		}).filter(e => e.length);
 	}
@@ -181,10 +180,10 @@ class AnimatedStatus {
 		let addStep = GUI.newButton("+", false);
 		GUI.setSuggested(addStep, true);
 		addStep.onclick = () => {
-			// Don't add divider to first element
-			if (editor.childNodes.length) editor.appendChild(GUI.newDivider());
-			editor.appendChild(this.newRichRow());
-		};
+			let row = this.newRichRow();
+			if (editor.childNodes.length) row.style.marginTop = "15px";
+			editor.appendChild(row);
+		}
 		actionsRich.appendChild(addStep);
 
 		// Have spacing between the buttons
@@ -192,14 +191,7 @@ class AnimatedStatus {
 
 		let delStep = GUI.newButton("-", false);
 		GUI.setDestructive(delStep, true);
-		delStep.onclick = () => {
-			let rows = editor.childNodes;
-			// remove divider and input
-			for (let i = 0; i < 2; i++) {
-				if (!rows.length) return;
-				editor.removeChild(rows[rows.length - 1]);
-			}
-		};
+		delStep.onclick = () => editor.removeChild(editor.childNodes[editor.childNodes.length - 1]);
 		actionsRich.appendChild(delStep);
 
 		let preferredEditor = this.getData("preferredEditor");
@@ -342,7 +334,6 @@ const GUI = {
 	// TODO: consider using margin / padding over minheight and width (or the appropriate html element)
 	newDivider: (size = "15px") => {
 		let divider = document.createElement("div");
-		divider.setAttribute("type", "divider");
 		divider.style.minHeight = size;
 		divider.style.minWidth = size;
 		return divider;
