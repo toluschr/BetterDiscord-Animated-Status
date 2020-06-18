@@ -277,8 +277,8 @@ class AnimatedStatus {
 			BdApi.showToast("Settings were saved!", {type: "success"});
 
 			// Restart
-			this.stop();
 			this.load();
+			this.stop();
 			this.start();
 		};
 
