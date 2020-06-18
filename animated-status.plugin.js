@@ -316,18 +316,10 @@ const Status = {
 	set: (status) => {
 		let data = {};
 
-		switch (status.length) {
-			case 3: data.emoji_id = status[2];
-			case 2: data.emoji_name = status[1];
-			case 1: data.text = status[0]; break;
-			default: return;
-		}
-		/*
 		if (status.length == 0) return;
 		if (status.length >= 1) data.text = status[0];
 		if (status.length >= 2) data.emoji_name = status[1];
 		if (status.length >= 3) data.emoji_id = status[2];
-		*/
 
 		Status.request().send(JSON.stringify({custom_status: data}));
 	},
