@@ -291,21 +291,43 @@ class AnimatedStatus {
 const Status = {
 	authToken: "",
 
+	errorString: (code) => {
+		switch (code) {
+			case 401: return "Invalid AuthToken";
+			default: return "Internal Error, report at github.com/toluschr/BetterDiscord-Animated-Status";
+		}
+	},
+
 	request: () => {
 		let req = new XMLHttpRequest();
 		req.open("PATCH", "/api/v6/users/@me/settings", true);
 		req.setRequestHeader("authorization", Status.authToken);
 		req.setRequestHeader("content-type", "application/json");
+		req.onload = () => {
+			if (req.status < 400) {
+				return;
+			}
+
+			BdApi.showToast(`Animated Status: Can't change status: ${Status.errorString(req.status)}`, {type: "error"});
+		};
 		return req;
 	},
 
 	set: (status) => {
 		let data = {};
 
+		switch (status.length) {
+			case 3: data.emoji_id = status[2];
+			case 2: data.emoji_name = status[1];
+			case 1: data.text = status[0]; break;
+			default: return;
+		}
+		/*
 		if (status.length == 0) return;
 		if (status.length >= 1) data.text = status[0];
 		if (status.length >= 2) data.emoji_name = status[1];
 		if (status.length >= 3) data.emoji_id = status[2];
+		*/
 
 		Status.request().send(JSON.stringify({custom_status: data}));
 	},
