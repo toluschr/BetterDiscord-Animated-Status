@@ -160,7 +160,7 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
 		let timeout = GUI.newInput();
 		timeout.setAttribute("type", "number");
-		timeout.oninput = () => {
+		timeout.onfocusout = () => {
 			if (parseInt(timeout.value) < 1000) {
 				timeout.value = "1000";
 			}
