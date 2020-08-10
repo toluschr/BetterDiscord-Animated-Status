@@ -182,8 +182,8 @@ class AnimatedStatus {
 
 		let actionsRich = GUI.newHBox();
 
-		let addStep = GUI.newButton("+", false);
-		GUI.setSuggested(addStep, true);
+		let addStep = GUI.setSuggested(GUI.newButton("+", false));
+		addStep.title = "Add step to end";
 		addStep.onclick = () => {
 			let row = this.newRichRow();
 			if (editor.childNodes.length) row.style.marginTop = "15px";
@@ -194,8 +194,8 @@ class AnimatedStatus {
 		// Have spacing between the buttons
 		actionsRich.appendChild(GUI.newDivider());
 
-		let delStep = GUI.newButton("-", false);
-		GUI.setDestructive(delStep, true);
+		let delStep = GUI.setDestructive(GUI.newButton("-", false));
+		delStep.title = "Remove last step";
 		delStep.onclick = () => editor.removeChild(editor.childNodes[editor.childNodes.length - 1]);
 		actionsRich.appendChild(delStep);
 
@@ -387,13 +387,13 @@ const GUI = {
 		return element;
 	},
 
-	setSuggested: (element, value) => {
+	setSuggested: (element, value = true) => {
 		if (value) element.classList.add("colorGreen-29iAKY");
 		else element.classList.remove("mystyle");
 		return element;
 	},
 
-	setDestructive: (element, value) => {
+	setDestructive: (element, value = true) => {
 		if (value) element.classList.add("colorRed-1TFJan");
 		else element.classList.remove("colorRed-1TFJan");
 		return element;
