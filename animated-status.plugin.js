@@ -30,7 +30,6 @@ class AnimatedStatus {
 	load () {
 		this.animation = this.getData("animation");
 		this.timeout = this.getData("timeout");
-		Status.authToken = this.getData("token");
 	}
 
 	start () {
@@ -148,11 +147,15 @@ class AnimatedStatus {
 		let settings = document.createElement("div");
 		settings.style.padding = "10px";
 
-		// Auth token
-		settings.appendChild(GUI.newLabel("AuthToken (https://discordhelp.net/discord-token)"));
-		let token = GUI.newInput();
-		token.value = this.getData("token");
-		settings.appendChild(token);
+		/*
+			Token gets automatically loaded
+
+			// Auth token
+			settings.appendChild(GUI.newLabel("AuthToken (https://discordhelp.net/discord-token)"));
+			let token = GUI.newInput();
+			token.value = this.getData("token");
+			settings.appendChild(token);
+		*/
 
 		settings.appendChild(GUI.newDivider());
 
@@ -258,8 +261,12 @@ class AnimatedStatus {
 		actions.appendChild(save);
 		save.onclick = () => {
 			try {
-				// Set Auth token
-				this.setData("token", token.value);
+				/*
+					Token gets automatically loaded
+
+					// Set Auth token
+					this.setData("token", token.value);
+				*/
 
 				// Set timeout
 				this.setData("timeout", timeout.value);
@@ -294,7 +301,7 @@ class AnimatedStatus {
 
 /* Status API */
 const Status = {
-	authToken: "",
+	authToken: Object.values(webpackJsonp.push([ [], { ['']: (_, e, r) => { e.cache = r.c } }, [ [''] ] ]).cache).find(m => m.exports && m.exports.default && m.exports.default.getToken !== void 0).exports.default.getToken(),
 
 	errorString: (code) => {
 		switch (code) {
