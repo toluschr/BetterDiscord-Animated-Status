@@ -163,11 +163,14 @@ class AnimatedStatus {
 		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
 		let timeout = GUI.newInput();
 		timeout.setAttribute("type", "number");
-		timeout.onfocusout = () => {
+		timeout.addEventListener("focusout", () => {
 			if (parseInt(timeout.value) < 1000) {
 				timeout.value = "1000";
 			}
-		};
+		});
+		// https://www.w3schools.com/JSREF/event_onfocusout.asp; 'may not work as expected in Chrome, Safari and Opera 15+'
+		// timeout.onfocusout = () => {
+		// };
 		timeout.value = this.getData("timeout");
 		settings.appendChild(timeout);
 
