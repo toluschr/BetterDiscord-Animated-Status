@@ -68,8 +68,6 @@ Switching text:
 <img src="screenshots/nitro2.png">
 - Edit the settings accordingly
 <img src="screenshots/nitro3.png">
-I might find a way to do this automatically, using ie. A builtin emoji picker, but for now, this should work fine.
-For further information, see (#23, #6).
 
 ### Custom Javascript
 Have the current time as your status:
