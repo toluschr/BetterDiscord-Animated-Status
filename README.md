@@ -8,6 +8,7 @@
 * ['rich' vs 'raw' editor](#rich-vs-raw-editor)
 * [Animations](#animations)
 * [Examples](#examples)
+* [Discord Nitro Emoji](#discord-nitro-emoji)
 	* [Custom Javascript](#custom-javascript)
 
 <!-- vim-markdown-toc -->
@@ -57,6 +58,18 @@ Switching text:
 "Text 1"
 "Text 2 with emoji", "👍"
 ```
+
+## Discord Nitro Emoji
+- Open a discord Chat, type `\`.
+<img src="screenshots/nitro0.png">
+- Select the emoji you want to include in your status using the emoji picker.
+<img src="screenshots/nitro1.png">
+- Notice that the message changed to `<:emojiname:emojiid>`. The values inside the brackets (emojiname and emojiid) are the values required for the status.
+<img src="screenshots/nitro2.png">
+- Edit the settings accordingly
+<img src="screenshots/nitro3.png">
+I might find a way to do this automatically, using ie. A builtin emoji picker, but for now, this should work fine.
+For further information, see (#23, #6).
 
 ### Custom Javascript
 Have the current time as your status:
