@@ -96,7 +96,7 @@ class AnimatedStatus {
 		//hbox.appendChild(GUI.newDivider());
 
 		let optNitroIdWidget = GUI.newInput(optNitroId);
-		optNitroIdWidget.placeholder = "(optional) nitro_id";
+		optNitroIdWidget.placeholder = "nitro_id";
 		optNitroIdWidget.style.width = "150px";
 		if (optNitroId != undefined) optNitroIdWidget.value = optNitroId;
 		hbox.appendChild(optNitroIdWidget);
