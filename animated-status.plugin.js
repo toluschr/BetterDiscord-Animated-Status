@@ -303,11 +303,20 @@ class AnimatedStatus {
 const Status = {
 	authToken: Object.values(webpackJsonp.push([ [], { ['']: (_, e, r) => { e.cache = r.c } }, [ [''] ] ]).cache).find(m => m.exports && m.exports.default && m.exports.default.getToken !== void 0).exports.default.getToken(),
 
-	errorString: (code) => {
-		switch (code) {
-			case 401: return "Invalid AuthToken";
-			default: return "Internal Error, report at github.com/toluschr/BetterDiscord-Animated-Status";
+	errorString: (req) => {
+		if (req.status < 400)
+			return undefined;
+
+		if (req.status == 401)
+			return "Invalid AuthToken";
+
+		let json = JSON.parse(req.response);
+		for (const s of ["errors", "custom_status", "text", "_errors", 0, "message"]) {
+			if ((json = json[s]) == undefined)
+				return "Internal. Report at github.com/toluschr/BetterDiscord-Animated-Status";
 		}
+
+		return json;
 	},
 
 	request: () => {
@@ -316,11 +325,9 @@ const Status = {
 		req.setRequestHeader("authorization", Status.authToken);
 		req.setRequestHeader("content-type", "application/json");
 		req.onload = () => {
-			if (req.status < 400) {
-				return;
-			}
-
-			BdApi.showToast(`Animated Status: Can't change status: ${Status.errorString(req.status)}`, {type: "error"});
+			let err = Status.errorString(req);
+			if (err != undefined)
+				BdApi.showToast(`Animated Status: Error: ${err}`, {type: "error"});
 		};
 		return req;
 	},
