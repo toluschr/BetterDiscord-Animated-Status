@@ -1,48 +1,61 @@
 //META{"name":"AnimatedStatus","source":"https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/animated-status.plugin.js","website":"https://github.com/toluschr/BetterDiscord-Animated-Status"}*//
 
+const Editor_Type = {
+	RICH: 0,
+	RAW: 1,
+};
+
 class AnimatedStatus {
 	/* BD functions */
-	getName () {
+	getName() {
 		return "AnimatedStatus";
 	}
 
-	getVersion () {
-		return "0.11.0";
+	getVersion() {
+		return "0.11.1";
 	}
 
-	getAuthor () {
+	getAuthor() {
 		return "toluschr";
 	}
 
-	getDescription () {
+	getDescription() {
 		return "Animate your Discord status";
 	}
 
-	setData (key, value) {
+	setData(key, value) {
 		BdApi.setData(this.getName(), key, value);
 	}
 
-	getData (key) {
+	getData(key) {
 		return BdApi.getData(this.getName(), key);
 	}
 
 	/* Code related to Animations */
-	load () {
-		this.animation = this.getData("animation");
-		this.timeout = this.getData("timeout");
+	load() {
+		this.kSpacing = "15px";
+		this.kMinTimeout = 2900;
+		this.kDefaultEditor = Editor_Type.RICH;
+
+		this.animation = this.getData("animation") || [];
+		this.timeout = this.getData("timeout") || this.kMinTimeout;
+		this.editor = this.getData("editor") || this.kDefaultEditor;
+
+		// Be compatible with older configs
+		if (typeof this.timeout == "string")
+			this.timeout = parseInt(this.timeout);
 	}
 
-	start () {
-		if (this.animation == undefined || this.timeout == undefined || Status.authToken == undefined) return;
+	start() {
 		this.Status_Animate();
 	}
 
-	stop () {
+	stop() {
 		clearTimeout(this.loop);
 		Status.unset();
 	}
 
-	Status_Eval (string) {
+	Status_Eval(string) {
 		try {
 			return ((string.startsWith("eval ")) ? (eval(string.substr(5))) : (string));
 		}
@@ -52,7 +65,7 @@ class AnimatedStatus {
 		}
 	}
 
-	Status_Animate (index = 0) {
+	Status_Animate(index = 0) {
 		if (index >= this.animation.length) index = 0;
 		if (this.animation[index] == undefined) {
 			BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
@@ -67,7 +80,7 @@ class AnimatedStatus {
 	}
 
 	// Ui related, but special components
-	newRawEdit (str = "") {
+	newRawEdit(str = "") {
 		let out = GUI.newTextarea();
 		out.style.fontFamily = "SourceCodePro,Consolas,Liberation Mono,Menlo,Courier,monospace";
 		out.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n"eval new String(\'test\') (Javascript)"\n"eval new String(\'test\') (Javascript)", "eval new String(\'👍\') (Javascript)"\n...';
@@ -75,25 +88,21 @@ class AnimatedStatus {
 		return out;
 	}
 
-	newRichRow (text, emoji, optNitroId = undefined) {
+	newRichRow(text, emoji, optNitroId = undefined) {
 		let hbox = GUI.newHBox();
 
 		let textWidget = GUI.newInput(text);
 		textWidget.placeholder = "Text";
-		textWidget.style.marginRight = "15px";
+		textWidget.style.marginRight = this.kSpacing;
 		if (text != undefined) textWidget.value = text;
 		hbox.appendChild(textWidget);
-
-		// hbox.appendChild(GUI.newDivider());
 
 		let emojiWidget = GUI.newInput(emoji);
 		emojiWidget.placeholder = "👍 / nitro_name";
 		emojiWidget.style.width = "140px";
-		emojiWidget.style.marginRight = "15px";
+		emojiWidget.style.marginRight = this.kSpacing;
 		if (emoji != undefined) emojiWidget.value = emoji;
 		hbox.appendChild(emojiWidget);
-
-		//hbox.appendChild(GUI.newDivider());
 
 		let optNitroIdWidget = GUI.newInput(optNitroId);
 		optNitroIdWidget.placeholder = "nitro_id";
@@ -105,12 +114,12 @@ class AnimatedStatus {
 	}
 
 	// Conversion related
-	strToJson (str) {
+	strToJson(str) {
 		return str.split("\n").filter(i => i).map((element) => JSON.parse(`[${element}]`));
 	}
 
-	jsonToStr (animation) {
-		if (animation == undefined) return ""
+	jsonToStr(animation) {
+		if (animation == undefined) return "";
 
 		let out = "";
 		for (let i = 0; i < animation.length; i++) {
@@ -119,7 +128,7 @@ class AnimatedStatus {
 		return out;
 	}
 
-	jsonToRichEdit (json) {
+	jsonToRichEdit(json) {
 		let out = document.createElement("div");
 		for (let i = 0; i < json.length; i++) {
 			// text is 0, emoji is 1
@@ -134,7 +143,7 @@ class AnimatedStatus {
 		return out;
 	}
 
-	richEditToJson (editor) {
+	richEditToJson(editor) {
 		return Array.prototype.slice.call(editor.childNodes).map((element) => {
 				return Array.prototype.slice.call(element.childNodes)
 					.filter(e => e.value.length)
@@ -143,44 +152,32 @@ class AnimatedStatus {
 	}
 
 	// Settings
-	getSettingsPanel () {
+	getSettingsPanel() {
 		let settings = document.createElement("div");
 		settings.style.padding = "10px";
-
-		/*
-			Token gets automatically loaded
-
-			// Auth token
-			settings.appendChild(GUI.newLabel("AuthToken (https://discordhelp.net/discord-token)"));
-			let token = GUI.newInput();
-			token.value = this.getData("token");
-			settings.appendChild(token);
-		*/
-
-		settings.appendChild(GUI.newDivider());
 
 		// timeout
 		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
 		let timeout = GUI.newInput();
 		timeout.setAttribute("type", "number");
 		timeout.addEventListener("focusout", () => {
-			if (parseInt(timeout.value) < 2900) {
-				timeout.value = "2900";
+			if (parseInt(timeout.value) < this.kMinTimeout) {
+				timeout.value = String(this.kMinTimeout);
 			}
 		});
-		timeout.value = this.getData("timeout");
+		timeout.value = String(this.timeout);
+		timeout.style.marginBottom = this.kSpacing;
 		settings.appendChild(timeout);
-
-		settings.appendChild(GUI.newDivider());
 
 		// Animation
 		settings.appendChild(GUI.newLabel('Animation'));
 		let animationContainer = document.createElement("div");
+		animationContainer.marginBottom = this.kSpacing;
 		settings.appendChild(animationContainer);
 
 		// Actions
-		settings.appendChild(GUI.newDivider());
 		let actions = GUI.newHBox();
+		actions.style.marginTop = this.kSpacing;
 		settings.appendChild(actions);
 
 		let actionsRich = GUI.newHBox();
@@ -189,96 +186,75 @@ class AnimatedStatus {
 		addStep.title = "Add step to end";
 		addStep.onclick = () => {
 			let row = this.newRichRow();
-			if (editor.childNodes.length) row.style.marginTop = "15px";
-			editor.appendChild(row);
+			if (edit.childNodes.length) row.style.marginTop = this.kSpacing;
+			edit.appendChild(row);
 		}
 		actionsRich.appendChild(addStep);
 
-		// Have spacing between the buttons
-		actionsRich.appendChild(GUI.newDivider());
-
 		let delStep = GUI.setDestructive(GUI.newButton("-", false));
 		delStep.title = "Remove last step";
-		delStep.onclick = () => editor.removeChild(editor.childNodes[editor.childNodes.length - 1]);
+		delStep.style.marginLeft = this.kSpacing;
+		delStep.onclick = () => edit.removeChild(edit.childNodes[edit.childNodes.length - 1]);
 		actionsRich.appendChild(delStep);
 
-		let preferredEditor = this.getData("preferredEditor");
-		let editor = undefined, animation = undefined;
-		if (preferredEditor == "rich") {
-			editor = this.jsonToRichEdit(this.getData("animation"));
-			animationContainer.appendChild(editor);
+		let edit = undefined;
+		if (this.editor == Editor_Type.RICH) {
+			edit = this.jsonToRichEdit(this.animation);
 			actionsRich.style.display = "flex";
-		}
-		else {
-			animation = this.newRawEdit(this.jsonToStr(this.getData("animation")));
-			animationContainer.appendChild(animation);
+		} else {
+			edit = this.newRawEdit(this.jsonToStr(this.animation));
 			actionsRich.style.display = "none";
 		}
+		animationContainer.appendChild(edit);
 
-		// TODO make this respect this.preferredEditor
 		let changeEditMode = GUI.newButton("Change Edit Mode");
 		actions.appendChild(changeEditMode);
 
 		// TODO make this function less bad
 		changeEditMode.onclick = () => {
-			let remove = undefined, append = undefined;
+			this.editor = !this.editor;
+			let newEdit = undefined;
 
 			try {
-				if (preferredEditor == "rich") {
-					animation = this.newRawEdit(this.jsonToStr(this.richEditToJson(editor)));
-					[remove, append] = [editor, animation];
-					actionsRich.style.display = "none";
-				}
-				else {
-					editor = this.jsonToRichEdit(this.strToJson(animation.value));
-					[remove, append] = [animation, editor];
+				if (this.editor == Editor_Type.RICH) {
+					newEdit = this.jsonToRichEdit(this.strToJson(edit.value));
 					actionsRich.style.display = "flex";
+				} else {
+					newEdit = this.newRawEdit(this.jsonToStr(this.richEditToJson(edit)));
+					actionsRich.style.display = "none";
 				}
 			}
 			catch (e) {
-				BdApi.showToast(e, {type: "error"})
-				// Don't try to change the type
+				BdApi.showToast(e, {type: "error"});
 				return;
 			}
 
-			// TODO Consider making this an integer
-			// TODO save here?
-			preferredEditor = (preferredEditor == "rich" ? "raw" : "rich");
-			animationContainer.appendChild(append);
-			animationContainer.removeChild(remove);
-			remove.remove();
+			animationContainer.removeChild(edit);
+			animationContainer.appendChild(newEdit);
+			edit = newEdit;
 		};
 
 		// Append actions Rich after change edit mode
-		actions.appendChild(GUI.newDivider());
+		actionsRich.style.marginLeft = this.kSpacing
 		actions.appendChild(actionsRich);
 
 		// Move save to the right
-		actions.appendChild(GUI.setExpand(GUI.newDivider(), 2));
+		actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
 
 		let save = GUI.newButton("Save");
 		GUI.setSuggested(save, true);
 		actions.appendChild(save);
 		save.onclick = () => {
 			try {
-				/*
-					Token gets automatically loaded
-
-					// Set Auth token
-					this.setData("token", token.value);
-				*/
-
 				// Set timeout
-				this.setData("timeout", timeout.value);
-
-				// set preferredEditor, one of ("raw", "rich")
-				this.setData("preferredEditor", preferredEditor);
+				this.setData("timeout", parseInt(timeout.value));
+				this.setData("editor", this.editor);
 
 				// Set Animation
-				if (preferredEditor == "rich")
-					this.setData("animation", this.richEditToJson(editor));
+				if (this.editor == Editor_Type.RICH)
+					this.setData("animation", this.richEditToJson(edit));
 				else
-					this.setData("animation", this.strToJson(animation.value));
+					this.setData("animation", this.strToJson(edit.value));
 			}
 			catch (e) {
 				BdApi.showToast(e, {type: "error"});
@@ -361,14 +337,6 @@ const GUI = {
 		label.className = "h5-18_1nd";
 		label.innerText = text;
 		return label;
-	},
-
-	// TODO: consider using margin / padding over minheight and width (or the appropriate html element)
-	newDivider: (size = "15px") => {
-		let divider = document.createElement("div");
-		divider.style.minHeight = size;
-		divider.style.minWidth = size;
-		return divider;
 	},
 
 	newTextarea: () => {
