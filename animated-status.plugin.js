@@ -163,6 +163,7 @@ class AnimatedStatus {
 		timeout.addEventListener("focusout", () => {
 			if (parseInt(timeout.value) < this.kMinTimeout) {
 				timeout.value = String(this.kMinTimeout);
+				BdApi.showToast(`Timeout must not be lower than ${this.kMinTimeout}`, {type: "error"});
 			}
 		});
 		timeout.value = String(this.timeout);
