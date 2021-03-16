@@ -31,8 +31,8 @@ Example: With a timeout of 2000, the following animation would take 4 seconds to
 "abc"
 "def"
 ```
-The animation timeout should be at least 2900 milliseconds for the animation to look smooth on other clients. This makes sure no keyframe gets gets lost.
-On mobile systems the timeout might have to be set a little higher (10-14 Seconds)\
+The animation timeout should be at least `10000` milliseconds(10 seconds) for the animation to look smooth on other clients. This makes sure no keyframe gets lost.\
+On mobile app some places(list of server members) that take longer(randomly or based on your action) to be updated, so don’t be surprised if your animation isn’t fluid in these places.\
 ^ According to [@pintoso](https://github.com/pintoso)
 
 ## 'rich' vs 'raw' editor
