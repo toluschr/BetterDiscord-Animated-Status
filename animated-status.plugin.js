@@ -33,13 +33,19 @@ class AnimatedStatus {
 
 	/* Code related to Animations */
 	load() {
-		this.kSpacing = "15px";
-		this.kMinTimeout = 2900;
-		this.kDefaultEditor = Editor_Type.RICH;
+		this.kAnimationPropertyName  = "animation";
+		this.kTimeoutPropertyName    = "timeout";
+		this.kEditorTypePropertyName = "editor";
+		this.kRandomnessPropertyName = "randomness";
 
-		this.animation = this.getData("animation") || [];
-		this.timeout = this.getData("timeout") || this.kMinTimeout;
-		this.editor = this.getData("editor") || this.kDefaultEditor;
+		this.kSpacing       = "15px";
+		this.kMinTimeout    = 2900;
+		this.kDefaultEdtior = Editor_Type.RICH;
+
+		this.animation  = this.getData(this.kAnimationPropertyName)  || [];
+		this.timeout    = this.getData(this.kTimeoutPropertyName)    || this.kMinTimeout;
+		this.editor     = this.getData(this.kEditorTypePropertyName) || this.kDefaultEdtior;
+		this.randomness = this.getData(this.kRandomnessPropertyName) || 0;
 
 		// Be compatible with older configs
 		if (typeof this.timeout == "string")
@@ -75,16 +81,17 @@ class AnimatedStatus {
 		let results = this.animation[index].map(async (element) => this.Status_Eval(element));
 		Promise.all(results).then(res => {
 			Status.set(res)
-			this.loop = setTimeout(() => { this.Status_Animate(index + 1); }, this.timeout);
+			this.loop = setTimeout(() => {
+				this.Status_Animate(index + 1);
+			}, this.timeout + this.randomness * Math.random());
 		});
 	}
 
 	// Ui related, but special components
 	newRawEdit(str = "") {
-		let out = GUI.newTextarea();
+		let out = GUI.newTextarea(str);
 		out.style.fontFamily = "SourceCodePro,Consolas,Liberation Mono,Menlo,Courier,monospace";
 		out.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n"eval new String(\'test\') (Javascript)"\n"eval new String(\'test\') (Javascript)", "eval new String(\'👍\') (Javascript)"\n...';
-		out.value = str;
 		return out;
 	}
 
@@ -94,20 +101,17 @@ class AnimatedStatus {
 		let textWidget = GUI.newInput(text);
 		textWidget.placeholder = "Text";
 		textWidget.style.marginRight = this.kSpacing;
-		if (text != undefined) textWidget.value = text;
 		hbox.appendChild(textWidget);
 
 		let emojiWidget = GUI.newInput(emoji);
 		emojiWidget.placeholder = "👍 / nitro_name";
 		emojiWidget.style.width = "140px";
 		emojiWidget.style.marginRight = this.kSpacing;
-		if (emoji != undefined) emojiWidget.value = emoji;
 		hbox.appendChild(emojiWidget);
 
 		let optNitroIdWidget = GUI.newInput(optNitroId);
 		optNitroIdWidget.placeholder = "nitro_id";
 		optNitroIdWidget.style.width = "150px";
-		if (optNitroId != undefined) optNitroIdWidget.value = optNitroId;
 		hbox.appendChild(optNitroIdWidget);
 
 		return hbox;
@@ -157,26 +161,24 @@ class AnimatedStatus {
 		settings.style.padding = "10px";
 
 		// timeout
-		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
-		let timeout = GUI.newInput();
-		timeout.setAttribute("type", "number");
-		timeout.addEventListener("focusout", () => {
-			if (parseInt(timeout.value) < this.kMinTimeout) {
-				timeout.value = String(this.kMinTimeout);
-				BdApi.showToast(`Timeout must not be lower than ${this.kMinTimeout}`, {type: "error"});
-			}
-		});
-		timeout.value = String(this.timeout);
+		settings.appendChild(GUI.newLabel("Time per Keyframe (i.e. 3000: Wait 3 seconds after status-change)"));
+		let timeout = GUI.newNumericInput(this.timeout, this.kMinTimeout);
 		timeout.style.marginBottom = this.kSpacing;
 		settings.appendChild(timeout);
 
-		// Animation
+		// randomness
+		settings.appendChild(GUI.newLabel("Randomness (i.e. 2000: Add random timeout from 0 to 2 seconds)"))
+		let randomness = GUI.newNumericInput(this.randomness);
+		randomness.style.marginBottom = this.kSpacing;
+		settings.appendChild(randomness);
+
+		// animation
 		settings.appendChild(GUI.newLabel('Animation'));
 		let animationContainer = document.createElement("div");
 		animationContainer.marginBottom = this.kSpacing;
 		settings.appendChild(animationContainer);
 
-		// Actions
+		// actions
 		let actions = GUI.newHBox();
 		actions.style.marginTop = this.kSpacing;
 		settings.appendChild(actions);
@@ -248,14 +250,15 @@ class AnimatedStatus {
 		save.onclick = () => {
 			try {
 				// Set timeout
-				this.setData("timeout", parseInt(timeout.value));
-				this.setData("editor", this.editor);
+				this.setData(this.kTimeoutPropertyName, parseInt(timeout.value));
+				this.setData(this.kEditorTypePropertyName, this.editor);
+				this.setData(this.kRandomnessPropertyName, parseInt(randomness.value));
 
 				// Set Animation
 				if (this.editor == Editor_Type.RICH)
-					this.setData("animation", this.richEditToJson(edit));
+					this.setData(this.kAnimationPropertyName, this.richEditToJson(edit));
 				else
-					this.setData("animation", this.strToJson(edit.value));
+					this.setData(this.kAnimationPropertyName, this.strToJson(edit.value));
 			}
 			catch (e) {
 				BdApi.showToast(e, {type: "error"});
@@ -326,24 +329,37 @@ const Status = {
 
 // Used to easily style elements like the 'native' discord ones
 const GUI = {
+	newNumericInput: (text = "", min = 0) => {
+		let out = GUI.newInput(text);
+		out.setAttribute("type", "number");
+		out.addEventListener("focusout", () => {
+			if (parseInt(out.value) < min) {
+				out.value = String(min);
+				BdApi.showToast(`Value must not be lower than ${min}`, {type: "error"});
+			}
+		});
+		return out;
+	},
+
 	newInput: (text = "") => {
 		let input = document.createElement("input");
 		input.className = "inputDefault-_djjkz input-cIJ7To";
-		input.innerText = text;
+		input.value = String(text);
 		return input;
 	},
 
-	newLabel: (text) => {
+	newLabel: (text = "") => {
 		let label = document.createElement("h5");
 		label.className = "h5-18_1nd";
 		label.innerText = text;
 		return label;
 	},
 
-	newTextarea: () => {
+	newTextarea: (text = "") => {
 		let textarea = document.createElement("textarea");
 		textarea.className = "input-cIJ7To scrollbarGhostHairline-1mSOM1";
 		textarea.style.resize = "vertical";
+		textarea.value = text;
 		textarea.rows = 4;
 		return textarea;
 	},
