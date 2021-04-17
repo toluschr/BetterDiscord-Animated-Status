@@ -32,7 +32,7 @@ Example: With a timeout of 2000, the following animation would take 4 seconds to
 "def"
 ```
 To prevent the discord server from being spammed with requests, the minimum allowed timeout is hardcoded to be 2.9 seconds. \
-Logically, the animation timeout should be at least `29000`, at best `10000` milliseconds (10 seconds) for the animation to look smooth on other clients. \
+Logically, the animation timeout should be at least `2900`, at best `10000` milliseconds (10 seconds) for the animation to look smooth on other clients. \
 In the mobile app, the status isn't updated consistently, i.e. the list of server members is updated based on the users actions in the app. Don't be surprised, if the animation doesn't appear smooth, or skips frames. \
 ^ According to [@pintoso](https://github.com/pintoso)
 
