@@ -67,14 +67,12 @@ class AnimatedStatus {
 		if (this.animation[i] == {}) {
 			Status.Set(null);
 		} else {
-			let resolved_status = {};
-			if (this.animation[i].text != undefined)
-				resolved_status.text = this.ResolveStatusField(this.animation[i].text);
-			if (this.animation[i].emoji_id != undefined)
-				resolved_status.emoji_id = this.ResolveStatusField(this.animation[i].emoji_id);
-			if (this.animation[i].emoji_name != undefined)
-				resolved_status.emoji_name = this.ResolveStatusField(this.animation[i].emoji_name);
-			Status.Set(resolved_status);
+			let resolved = {};
+			for (const s of ["text", "emoji_id", "emoji_name"]) {
+				if (this.animation[i][s] != undefined)
+					resolved[s] = this.ResolveStatusField(this.animation[i][s]);
+			}
+			Status.Set(resolved);
 		}
 
 		this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
