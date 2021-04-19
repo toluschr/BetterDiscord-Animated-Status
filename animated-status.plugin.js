@@ -50,9 +50,7 @@ class AnimatedStatus {
 		return data;
 	}
 
-	async ResolveStatusField(text) {
-		if (text == undefined) return "";
-
+	async ResolveStatusField(text = "") {
 		let evalPrefix = "eval ";
 		if (!text.startsWith(evalPrefix)) return text;
 
