@@ -40,7 +40,7 @@ In the mobile app, the status isn't updated consistently, i.e. the list of serve
 ### The Editor
 Each cell added with the `+`-button adds a new step to the status animation. \
 Clicking the `-`-button will remove the last step. \
-An empty cell will unset your status temporarily. This was added due to a request, but is subject to change in the future. \
+An empty cell will unset your status temporarily. This was added due to a request, but is subject to change in the future.
 
 In the latest version, the decision was made to remove the raw editor from the plugin. It was merely an unstable textual interface to the JSON config file. \
 **You can still use the RAW-Mode**, by clicking `Open Plugins Folder` inside the settings and editing `AnimatedStatus.config.json`. Do this at your own risk, you might break stuff.
