@@ -23,7 +23,10 @@ Enter the required information into the input fields and click the `save` button
 Clicking `done` without saving will discard your settings.
 
 ## Settings
-<img src="Screenshots/Settings.png">
+<p align="center">
+  <img src="Screenshots/Settings_Dark.png">
+  <img src="Screenshots/Settings_Light.png">
+</p>
 
 ### Timeout
 The value specifies the length of each animation step in milliseconds.
