@@ -23,6 +23,8 @@ Enter the required information into the input fields and click the `save` button
 Clicking `done` without saving will discard your settings.
 
 ## Settings
+<img src="Screenshots/Settings.png">
+
 ### Timeout
 The value specifies the length of each animation step in milliseconds.
 Example: With a timeout of 2000, the following animation would take 4 seconds to complete, as 2 keyframes last 2 seconds each.
@@ -42,9 +44,9 @@ Due to a request, the editor will not remove empty cells anymore. You can use em
 
 ### Emojis
 #### Regular Emoji
-Go to []() and copy the emoji you'd like to have as your status.
-The `emoji_name` field **may not contain whitespace**. Otherwise, the discord
-server will silently ignore your status request.
+Use an emoji selector (Windows: <kbd>Win</kbd>+<kbd>.</kbd>). \
+Alternatively, use [a unicode table](https://unicode.org/emoji/charts/full-emoji-list.html) and copy the emoji you'd like to have as your status. \
+The `emoji_name` field **may not contain whitespace**. Otherwise, the discord server will silently ignore your status request. \
 Due to uncertainties nitro emoji names, the plugin does currently not automatically remove whitespace.
 
 #### Nitro Emoji
