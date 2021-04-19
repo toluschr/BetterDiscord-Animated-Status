@@ -53,14 +53,14 @@ The `emoji_name` field **may not contain whitespace**. Otherwise, the discord se
 Due to uncertainties about nitro emoji names, the plugin does currently not automatically remove whitespace.
 
 #### Nitro Emoji
-- Open a discord Chat, type `\`.
-<img src="Screenshots/nitro0.png">
-- Select the emoji you want to include in your status using the emoji picker.
-<img src="Screenshots/nitro1.png">
-- Notice that the message changed to `<:emojiname:emojiid>`. The values inside the brackets (emojiname and emojiid) are the values required for the status.
-<img src="Screenshots/nitro2.png">
-- Edit the settings accordingly
-<img src="Screenshots/nitro3.png">
+- Open a discord Chat, type `\`. \
+  <img src="Screenshots/nitro0.png">
+- Select the emoji you want to include in your status using the emoji picker. \
+  <img src="Screenshots/nitro1.png">
+- Notice that the message changed to `<:emojiname:emojiid>`. The values inside the brackets (emojiname and emojiid) are the values required for the status. \
+  <img src="Screenshots/nitro2.png">
+- Edit the settings accordingly \
+  <img src="Screenshots/nitro3.png">
 
 ### Custom JavaScript
 Have the current time as your status:
