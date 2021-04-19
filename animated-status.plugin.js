@@ -1,33 +1,17 @@
 //META{"name":"AnimatedStatus","source":"https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/animated-status.plugin.js","website":"https://github.com/toluschr/BetterDiscord-Animated-Status"}*//
 
-const Editor_Type = {
-	RICH: 0,
-	RAW: 1,
-};
-
 class AnimatedStatus {
 	/* BD functions */
-	getName() {
-		return "AnimatedStatus";
-	}
+	getName() { return "AnimatedStatus"; }
+	getVersion() { return "0.12.0"; }
+	getAuthor() { return "toluschr"; }
+	getDescription() { return "Animate your Discord status"; }
 
-	getVersion() {
-		return "0.11.1";
-	}
-
-	getAuthor() {
-		return "toluschr";
-	}
-
-	getDescription() {
-		return "Animate your Discord status";
-	}
-
-	setData(key, value) {
+	SetData(key, value) {
 		BdApi.setData(this.getName(), key, value);
 	}
 
-	getData(key) {
+	GetData(key) {
 		return BdApi.getData(this.getName(), key);
 	}
 
@@ -35,120 +19,95 @@ class AnimatedStatus {
 	load() {
 		this.kSpacing = "15px";
 		this.kMinTimeout = 2900;
-		this.kDefaultEditor = Editor_Type.RICH;
 
-		this.animation = this.getData("animation") || [];
-		this.timeout = this.getData("timeout") || this.kMinTimeout;
-		this.editor = this.getData("editor") || this.kDefaultEditor;
+		this.animation = this.GetData("animation") || [];
+		this.timeout = this.GetData("timeout") || this.kMinTimeout;
 
-		// Be compatible with older configs
+		// Import Older Config Files
 		if (typeof this.timeout == "string")
 			this.timeout = parseInt(this.timeout);
+		if (this.animation.length > 0 && Array.isArray(this.animation[0]))
+			this.animation = this.animation.map(em => this.ConfigObjectFromArray);
 	}
 
 	start() {
-		this.Status_Animate();
+		if (this.animation.length == 0)
+			BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
+		else
+			this.AnimationLoop();
 	}
 
 	stop() {
 		clearTimeout(this.loop);
-		Status.unset();
+		Status.Set(null);
 	}
 
-	Status_Eval(string) {
+	ConfigObjectFromArray(arr) {
+		let data = {};
+		if (arr.length > 0 && arr[0].length > 0) data.text       = arr[0];
+		if (arr.length > 1 && arr[1].length > 0) data.emoji_name = arr[1];
+		if (arr.length > 2 && arr[2].length > 0) data.emoji_id   = arr[2];
+		return data;
+	}
+
+	ResolveStatusField(text) {
+		let evalPrefix = "eval ";
+		if (!text.startsWith(evalPrefix)) return text;
+
 		try {
-			return ((string.startsWith("eval ")) ? (eval(string.substr(5))) : (string));
-		}
-		catch (e) {
+			return eval(text.substr(evalPrefix.length));
+		} catch (e) {
 			BdApi.showToast(e, {type: "error"});
 			return "";
 		}
 	}
 
-	Status_Animate(index = 0) {
-		if (index >= this.animation.length) index = 0;
-		if (this.animation[index] == undefined) {
-			BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
-			return;
+	AnimationLoop(i = 0) {
+		i %= this.animation.length;
+		if (this.animation[i] == {}) {
+			Status.Set(null);
+		} else {
+			let resolved_status = {};
+			if (this.animation[i].text != undefined)
+				resolved_status.text = this.ResolveStatusField(this.animation[i].text);
+			if (this.animation[i].emoji_id != undefined)
+				resolved_status.emoji_id = this.ResolveStatusField(this.animation[i].emoji_id);
+			if (this.animation[i].emoji_name != undefined)
+				resolved_status.emoji_name = this.ResolveStatusField(this.animation[i].emoji_name);
+			Status.Set(resolved_status);
 		}
 
-		let results = this.animation[index].map(async (element) => this.Status_Eval(element));
-		Promise.all(results).then(res => {
-			Status.set(res)
-			this.loop = setTimeout(() => { this.Status_Animate(index + 1); }, this.timeout);
-		});
+		this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
 	}
 
-	// Ui related, but special components
-	newRawEdit(str = "") {
-		let out = GUI.newTextarea();
-		out.style.fontFamily = "SourceCodePro,Consolas,Liberation Mono,Menlo,Courier,monospace";
-		out.placeholder = '"Test (Message)"\n"Test (Message)", "👍 (Symbol)"\n"Test (Message)", "emoji (Nitro Symbol)", "000000000000000000 (Nitro Symbol ID)"\n"eval new String(\'test\') (Javascript)"\n"eval new String(\'test\') (Javascript)", "eval new String(\'👍\') (Javascript)"\n...';
-		out.value = str;
-		return out;
-	}
-
-	newRichRow(text, emoji, optNitroId = undefined) {
+	NewEditorRow({text, emoji_name, emoji_id} = {}) {
 		let hbox = GUI.newHBox();
 
-		let textWidget = GUI.newInput(text);
-		textWidget.placeholder = "Text";
+		let textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
 		textWidget.style.marginRight = this.kSpacing;
-		if (text != undefined) textWidget.value = text;
-		hbox.appendChild(textWidget);
 
-		let emojiWidget = GUI.newInput(emoji);
-		emojiWidget.placeholder = "👍 / nitro_name";
+		let emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍 / nitro_name"));
 		emojiWidget.style.width = "140px";
 		emojiWidget.style.marginRight = this.kSpacing;
-		if (emoji != undefined) emojiWidget.value = emoji;
-		hbox.appendChild(emojiWidget);
 
-		let optNitroIdWidget = GUI.newInput(optNitroId);
-		optNitroIdWidget.placeholder = "nitro_id";
-		optNitroIdWidget.style.width = "150px";
-		if (optNitroId != undefined) optNitroIdWidget.value = optNitroId;
-		hbox.appendChild(optNitroIdWidget);
-
+		let optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "nitro_id"));
+		optNitroIdWidget.style.width = "140px";
 		return hbox;
 	}
 
-	// Conversion related
-	strToJson(str) {
-		return str.split("\n").filter(i => i).map((element) => JSON.parse(`[${element}]`));
-	}
-
-	jsonToStr(animation) {
-		if (animation == undefined) return "";
-
-		let out = "";
-		for (let i = 0; i < animation.length; i++) {
-			out += JSON.stringify(animation[i]).substr(1).slice(0, -1) + "\n";
-		}
-		return out;
-	}
-
-	jsonToRichEdit(json) {
+	EditorFromJSON(json) {
 		let out = document.createElement("div");
 		for (let i = 0; i < json.length; i++) {
-			// text is 0, emoji is 1
-			let row = undefined;
-			if (json[i].length == 2) row = this.newRichRow(json[i][0], json[i][1]);
-			else row = this.newRichRow(json[i][0], json[i][1], json[i][2]);
-
+			let row = out.appendChild(this.NewEditorRow(json[i]));
 			if (i) row.style.marginTop = "15px";
-			out.appendChild(row);
 		}
-
 		return out;
 	}
 
-	richEditToJson(editor) {
-		return Array.prototype.slice.call(editor.childNodes).map((element) => {
-				return Array.prototype.slice.call(element.childNodes)
-					.filter(e => e.value.length)
-					.map(e => e.value);
-		}).filter(e => e.length);
+	JSONFromEditor(editor) {
+		return Array.prototype.slice.call(editor.childNodes).map(row => {
+			return this.ConfigObjectFromArray(Array.prototype.slice.call(row.childNodes).map(e => e.value));
+		});
 	}
 
 	// Settings
@@ -157,107 +116,56 @@ class AnimatedStatus {
 		settings.style.padding = "10px";
 
 		// timeout
-		settings.appendChild(GUI.newLabel("Time per Keyframe (In milliseconds)"));
-		let timeout = GUI.newInput();
+		settings.appendChild(GUI.newLabel("Step-Time (3000: 3 seconds, 3500: 3.5 seconds, ...)"));
+		let timeout = settings.appendChild(GUI.newInput(this.timeout));
 		timeout.setAttribute("type", "number");
+		timeout.style.marginBottom = this.kSpacing;
 		timeout.addEventListener("focusout", () => {
 			if (parseInt(timeout.value) < this.kMinTimeout) {
 				timeout.value = String(this.kMinTimeout);
 				BdApi.showToast(`Timeout must not be lower than ${this.kMinTimeout}`, {type: "error"});
 			}
 		});
-		timeout.value = String(this.timeout);
-		timeout.style.marginBottom = this.kSpacing;
-		settings.appendChild(timeout);
 
-		// Animation
-		settings.appendChild(GUI.newLabel('Animation'));
-		let animationContainer = document.createElement("div");
+		// Animation Container
+		settings.appendChild(GUI.newLabel("Animation"));
+		let animationContainer = settings.appendChild(document.createElement("div"));
 		animationContainer.marginBottom = this.kSpacing;
-		settings.appendChild(animationContainer);
+
+		// Editor
+		let edit = animationContainer.appendChild(this.EditorFromJSON(this.animation));
 
 		// Actions
-		let actions = GUI.newHBox();
+		let actions = settings.appendChild(GUI.newHBox());
 		actions.style.marginTop = this.kSpacing;
-		settings.appendChild(actions);
 
-		let actionsRich = GUI.newHBox();
-
-		let addStep = GUI.setSuggested(GUI.newButton("+", false));
+		// Add Step
+		let addStep = actions.appendChild(GUI.setSuggested(GUI.newButton("+", false)));
 		addStep.title = "Add step to end";
 		addStep.onclick = () => {
-			let row = this.newRichRow();
-			if (edit.childNodes.length) row.style.marginTop = this.kSpacing;
-			edit.appendChild(row);
+			let row = edit.appendChild(this.NewEditorRow());
+			if (edit.childNodes.length > 1)
+				row.style.marginTop = this.kSpacing;
 		}
-		actionsRich.appendChild(addStep);
 
-		let delStep = GUI.setDestructive(GUI.newButton("-", false));
+		// Del Step
+		let delStep = actions.appendChild(GUI.setDestructive(GUI.newButton("-", false)));
 		delStep.title = "Remove last step";
 		delStep.style.marginLeft = this.kSpacing;
 		delStep.onclick = () => edit.removeChild(edit.childNodes[edit.childNodes.length - 1]);
-		actionsRich.appendChild(delStep);
 
-		let edit = undefined;
-		if (this.editor == Editor_Type.RICH) {
-			edit = this.jsonToRichEdit(this.animation);
-			actionsRich.style.display = "flex";
-		} else {
-			edit = this.newRawEdit(this.jsonToStr(this.animation));
-			actionsRich.style.display = "none";
-		}
-		animationContainer.appendChild(edit);
-
-		let changeEditMode = GUI.newButton("Change Edit Mode");
-		actions.appendChild(changeEditMode);
-
-		// TODO make this function less bad
-		changeEditMode.onclick = () => {
-			this.editor = !this.editor;
-			let newEdit = undefined;
-
-			try {
-				if (this.editor == Editor_Type.RICH) {
-					newEdit = this.jsonToRichEdit(this.strToJson(edit.value));
-					actionsRich.style.display = "flex";
-				} else {
-					newEdit = this.newRawEdit(this.jsonToStr(this.richEditToJson(edit)));
-					actionsRich.style.display = "none";
-				}
-			}
-			catch (e) {
-				BdApi.showToast(e, {type: "error"});
-				return;
-			}
-
-			animationContainer.removeChild(edit);
-			animationContainer.appendChild(newEdit);
-			edit = newEdit;
-		};
-
-		// Append actions Rich after change edit mode
-		actionsRich.style.marginLeft = this.kSpacing
-		actions.appendChild(actionsRich);
-
-		// Move save to the right
+		// Move save to the right (XXX make use of flexbox)
 		actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
 
-		let save = GUI.newButton("Save");
+		// Save
+		let save = actions.appendChild(GUI.newButton("Save"));
 		GUI.setSuggested(save, true);
-		actions.appendChild(save);
 		save.onclick = () => {
 			try {
 				// Set timeout
-				this.setData("timeout", parseInt(timeout.value));
-				this.setData("editor", this.editor);
-
-				// Set Animation
-				if (this.editor == Editor_Type.RICH)
-					this.setData("animation", this.richEditToJson(edit));
-				else
-					this.setData("animation", this.strToJson(edit.value));
-			}
-			catch (e) {
+				this.SetData("timeout", parseInt(timeout.value));
+				this.SetData("animation", this.JSONFromEditor(edit));
+			} catch (e) {
 				BdApi.showToast(e, {type: "error"});
 				return;
 			}
@@ -281,21 +189,19 @@ const Status = {
 	authToken: Object.values(webpackJsonp.push([ [], { ['']: (_, e, r) => { e.cache = r.c } }, [ [''] ] ]).cache).find(m => m.exports && m.exports.default && m.exports.default.getToken !== void 0).exports.default.getToken(),
 
 	strerror: (req) => {
-		if (req.status < 400)
-			return undefined;
+		if (req.status  < 400) return undefined;
+		if (req.status == 401) return "Invalid AuthToken";
 
-		if (req.status == 401)
-			return "Invalid AuthToken";
-
+		// Discord _sometimes_ returns an error message
 		let json = JSON.parse(req.response);
 		for (const s of ["errors", "custom_status", "text", "_errors", 0, "message"])
 			if ((json == undefined) || ((json = json[s]) == undefined))
-				return "Internal. Report at github.com/toluschr/BetterDiscord-Animated-Status";
+				return "Unknown. Report at github.com/toluschr/BetterDiscord-Animated-Status";
 
 		return json;
 	},
 
-	request: () => {
+	Set: (status) => {
 		let req = new XMLHttpRequest();
 		req.open("PATCH", "/api/v8/users/@me/settings", true);
 		req.setRequestHeader("authorization", Status.authToken);
@@ -305,47 +211,25 @@ const Status = {
 			if (err != undefined)
 				BdApi.showToast(`Animated Status: Error: ${err}`, {type: "error"});
 		};
-		return req;
+		req.send(JSON.stringify({custom_status: status}));
 	},
-
-	set: (status) => {
-		let data = {};
-
-		if (status.length == 0) return;
-		if (status.length >= 1) data.text = status[0];
-		if (status.length >= 2) data.emoji_name = status[1];
-		if (status.length >= 3) data.emoji_id = status[2];
-
-		Status.request().send(JSON.stringify({custom_status: data}));
-	},
-
-	unset: () => {
-		Status.request().send('{"custom_status":null}');
-	}
 };
 
 // Used to easily style elements like the 'native' discord ones
 const GUI = {
-	newInput: (text = "") => {
+	newInput: (text = "", placeholder = "") => {
 		let input = document.createElement("input");
 		input.className = "inputDefault-_djjkz input-cIJ7To";
-		input.innerText = text;
+		input.value = String(text);
+		input.placeholder = String(placeholder);
 		return input;
 	},
 
-	newLabel: (text) => {
+	newLabel: (text = "") => {
 		let label = document.createElement("h5");
 		label.className = "h5-18_1nd";
-		label.innerText = text;
+		label.innerText = String(text);
 		return label;
-	},
-
-	newTextarea: () => {
-		let textarea = document.createElement("textarea");
-		textarea.className = "input-cIJ7To scrollbarGhostHairline-1mSOM1";
-		textarea.style.resize = "vertical";
-		textarea.rows = 4;
-		return textarea;
 	},
 
 	newButton: (text, filled = true) => {
@@ -353,7 +237,7 @@ const GUI = {
 		button.className = "button-38aScr colorBrand-3pXr91 sizeSmall-2cSMqn grow-q77ONN";
 		if (filled) button.classList.add("lookFilled-1Gx00P");
 		else button.classList.add("lookOutlined-3sRXeN");
-		button.innerText = text;
+		button.innerText = String(text);
 		return button;
 	},
 
