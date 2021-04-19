@@ -49,8 +49,8 @@ In the latest version, the decision was made to remove the raw editor from the p
 #### Regular Emoji
 Use an emoji selector (Windows: <kbd>Win</kbd>+<kbd>.</kbd>). \
 Alternatively, use [a unicode table](https://unicode.org/emoji/charts/full-emoji-list.html) and copy the emoji you'd like to have as your status. \
-The `emoji_name` field **may not contain whitespace**. Otherwise, the discord server will silently ignore your status request. \
-Due to uncertainties nitro emoji names, the plugin does currently not automatically remove whitespace.
+The `emoji_name` field **may not contain whitespace**. Otherwise, the discord server will silently ignore your status request.
+Due to uncertainties about nitro emoji names, the plugin does currently not automatically remove whitespace.
 
 #### Nitro Emoji
 - Open a discord Chat, type `\`.
