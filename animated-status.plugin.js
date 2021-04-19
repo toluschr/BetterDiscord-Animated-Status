@@ -44,13 +44,15 @@ class AnimatedStatus {
 
 	ConfigObjectFromArray(arr) {
 		let data = {};
-		if (arr.length > 0 && arr[0].length > 0) data.text       = arr[0];
-		if (arr.length > 1 && arr[1].length > 0) data.emoji_name = arr[1];
-		if (arr.length > 2 && arr[2].length > 0) data.emoji_id   = arr[2];
+		if (arr.length > 0 && arr[0] !== undefined && arr[0].length > 0) data.text       = arr[0];
+		if (arr.length > 1 && arr[1] !== undefined && arr[1].length > 0) data.emoji_name = arr[1];
+		if (arr.length > 2 && arr[2] !== undefined && arr[2].length > 0) data.emoji_id   = arr[2];
 		return data;
 	}
 
-	ResolveStatusField(text) {
+	async ResolveStatusField(text) {
+		if (text == undefined) return "";
+
 		let evalPrefix = "eval ";
 		if (!text.startsWith(evalPrefix)) return text;
 
@@ -64,18 +66,12 @@ class AnimatedStatus {
 
 	AnimationLoop(i = 0) {
 		i %= this.animation.length;
-		if (this.animation[i] == {}) {
-			Status.Set(null);
-		} else {
-			let resolved = {};
-			for (const s of ["text", "emoji_id", "emoji_name"]) {
-				if (this.animation[i][s] != undefined)
-					resolved[s] = this.ResolveStatusField(this.animation[i][s]);
-			}
-			Status.Set(resolved);
-		}
-
-		this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
+		Promise.all([this.ResolveStatusField(this.animation[i].text),
+					 this.ResolveStatusField(this.animation[i].emoji_name),
+					 this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
+			Status.Set(this.ConfigObjectFromArray(p));
+			this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
+		});
 	}
 
 	NewEditorRow({text, emoji_name, emoji_id} = {}) {
@@ -209,6 +205,7 @@ const Status = {
 			if (err != undefined)
 				BdApi.showToast(`Animated Status: Error: ${err}`, {type: "error"});
 		};
+		if (status === {}) status = null;
 		req.send(JSON.stringify({custom_status: status}));
 	},
 };
