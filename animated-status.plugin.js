@@ -73,10 +73,10 @@ class AnimatedStatus {
 		             this.ResolveStatusField(this.animation[i].emoji_name),
 		             this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
 			if (should_continue) {
-				this.cancel = undefined;
 				Status.Set(this.ConfigObjectFromArray(p));
 				this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
 			}
+			this.cancel = undefined;
 		});
 	}
 
