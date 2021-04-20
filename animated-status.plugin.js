@@ -2,17 +2,17 @@
 
 class AnimatedStatus {
 	/* BD functions */
-	getName() { return "AnimatedStatus"; }
+	getName() { return "Animated Status"; }
 	getVersion() { return "0.12.0"; }
 	getAuthor() { return "toluschr"; }
 	getDescription() { return "Animate your Discord status"; }
 
 	SetData(key, value) {
-		BdApi.setData(this.getName(), key, value);
+		BdApi.setData("AnimatedStatus", key, value);
 	}
 
 	GetData(key) {
-		return BdApi.getData(this.getName(), key);
+		return BdApi.getData("AnimatedStatus", key);
 	}
 
 	/* Code related to Animations */
@@ -70,8 +70,8 @@ class AnimatedStatus {
 		this.cancel = () => { should_continue = false; }
 
 		Promise.all([this.ResolveStatusField(this.animation[i].text),
-					 this.ResolveStatusField(this.animation[i].emoji_name),
-					 this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
+		             this.ResolveStatusField(this.animation[i].emoji_name),
+		             this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
 			if (should_continue) {
 				this.cancel = undefined;
 				Status.Set(this.ConfigObjectFromArray(p));
