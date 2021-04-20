@@ -19,6 +19,7 @@ class AnimatedStatus {
 	load() {
 		this.kSpacing = "15px";
 		this.kMinTimeout = 2900;
+		this.cancel = undefined;
 
 		this.animation = this.GetData("animation") || [];
 		this.timeout = this.GetData("timeout") || this.kMinTimeout;
@@ -38,6 +39,7 @@ class AnimatedStatus {
 	}
 
 	stop() {
+		if (this.cancel) this.cancel();
 		clearTimeout(this.loop);
 		Status.Set(null);
 	}
@@ -64,11 +66,17 @@ class AnimatedStatus {
 
 	AnimationLoop(i = 0) {
 		i %= this.animation.length;
+		let should_continue = true;
+		this.cancel = () => { should_continue = false; }
+
 		Promise.all([this.ResolveStatusField(this.animation[i].text),
 					 this.ResolveStatusField(this.animation[i].emoji_name),
 					 this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
-			Status.Set(this.ConfigObjectFromArray(p));
-			this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
+			if (should_continue) {
+				this.cancel = undefined;
+				Status.Set(this.ConfigObjectFromArray(p));
+				this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
+			}
 		});
 	}
 
