@@ -208,7 +208,7 @@ const Status = {
 
 	Set: (status) => {
 		let req = new XMLHttpRequest();
-		req.open("PATCH", "/api/v8/users/@me/settings", true);
+		req.open("PATCH", "/api/v9/users/@me/settings", true);
 		req.setRequestHeader("authorization", Status.authToken);
 		req.setRequestHeader("content-type", "application/json");
 		req.onload = () => {
