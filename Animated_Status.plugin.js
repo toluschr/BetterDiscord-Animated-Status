@@ -50,14 +50,10 @@ class AnimatedStatus {
 
 	ConfigObjectFromArray(arr) {
 		let data = {};
-		if (arr[0] !== undefined && arr[0].length > 0)
-			data.text = arr[0];
-		if (arr[1] !== undefined && arr[1].length > 0)
-			data.emoji_name = arr[1];
-		if (arr[2] !== undefined && arr[2].length > 0)
-			data.emoji_id = arr[2];
-		if (arr[3] !== undefined && (typeof arr[3] == "number" || arr[3].length > 0))
-			data.timeout = parseInt(arr[3]);
+		if (arr[0] !== undefined && arr[0].length > 0) data.text       = arr[0];
+		if (arr[1] !== undefined && arr[1].length > 0) data.emoji_name = arr[1];
+		if (arr[2] !== undefined && arr[2].length > 0) data.emoji_id   = arr[2];
+		if (arr[3] !== undefined && arr[3].length > 0) data.timeout    = parseInt(arr[3]);
 		return data;
 	}
 
