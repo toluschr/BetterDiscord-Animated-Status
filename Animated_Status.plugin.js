@@ -50,9 +50,14 @@ class AnimatedStatus {
 
 	ConfigObjectFromArray(arr) {
 		let data = {};
-		if (arr.length > 0 && arr[0] !== undefined && arr[0].length > 0) data.text       = arr[0];
-		if (arr.length > 1 && arr[1] !== undefined && arr[1].length > 0) data.emoji_name = arr[1];
-		if (arr.length > 2 && arr[2] !== undefined && arr[2].length > 0) data.emoji_id   = arr[2];
+		if (arr[0] !== undefined && arr[0].length > 0)
+			data.text = arr[0];
+		if (arr[1] !== undefined && arr[1].length > 0)
+			data.emoji_name = arr[1];
+		if (arr[2] !== undefined && arr[2].length > 0)
+			data.emoji_id = arr[2];
+		if (arr[3] !== undefined && (typeof arr[3] == "number" || arr[3].length > 0))
+			data.timeout = parseInt(arr[3]);
 		return data;
 	}
 
@@ -72,7 +77,7 @@ class AnimatedStatus {
 		i %= this.animation.length;
 		let should_continue = true;
 		this.loop = undefined;
-		this.cancel = () => { should_continue = false; }
+		this.cancel = () => { should_continue = false; };
 
 		Promise.all([this.ResolveStatusField(this.animation[i].text),
 		             this.ResolveStatusField(this.animation[i].emoji_name),
@@ -80,23 +85,29 @@ class AnimatedStatus {
 			this.cancel = undefined;
 			if (should_continue) {
 				Status.Set(this.ConfigObjectFromArray(p));
-				this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, this.timeout);
+				let timeout = this.animation[i].timeout || this.timeout;
+				this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, timeout);
 			}
 		});
 	}
 
-	NewEditorRow({text, emoji_name, emoji_id} = {}) {
+	NewEditorRow({text, emoji_name, emoji_id, timeout} = {}) {
 		let hbox = GUI.newHBox();
 
 		let textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
 		textWidget.style.marginRight = this.kSpacing;
 
 		let emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍 / nitro_name"));
-		emojiWidget.style.width = "140px";
 		emojiWidget.style.marginRight = this.kSpacing;
+		emojiWidget.style.width = "140px";
 
 		let optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "nitro_id"));
+		optNitroIdWidget.style.marginRight = this.kSpacing;
 		optNitroIdWidget.style.width = "140px";
+
+		let optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "duration"));
+		optTimeoutWidget.style.width = "75px";
+
 		return hbox;
 	}
 
@@ -121,16 +132,9 @@ class AnimatedStatus {
 		settings.style.padding = "10px";
 
 		// timeout
-		settings.appendChild(GUI.newLabel("Step-Time (3000: 3 seconds, 3500: 3.5 seconds, ...)"));
-		let timeout = settings.appendChild(GUI.newInput(this.timeout));
-		timeout.setAttribute("type", "number");
+		settings.appendChild(GUI.newLabel("Step-Duration (3000: 3 seconds, 3500: 3.5 seconds, ...), overwritten by invididual steps"));
+		let timeout = settings.appendChild(GUI.newNumericInput(this.timeout, this.kMinTimeout));
 		timeout.style.marginBottom = this.kSpacing;
-		timeout.addEventListener("focusout", () => {
-			if (parseInt(timeout.value) < this.kMinTimeout) {
-				timeout.value = String(this.kMinTimeout);
-				BdApi.showToast(`Timeout must not be lower than ${this.kMinTimeout}`, {type: "error"});
-			}
-		});
 
 		// Animation Container
 		settings.appendChild(GUI.newLabel("Animation"));
@@ -229,6 +233,18 @@ const GUI = {
 		input.value = String(text);
 		input.placeholder = String(placeholder);
 		return input;
+	},
+
+	newNumericInput: (text = "", minimum = 0, placeholder = "") => {
+		let out = GUI.newInput(text, placeholder);
+		out.setAttribute("type", "number");
+		out.addEventListener("focusout", () => {
+			if (parseInt(out.value) < minimum) {
+				out.value = String(minimum);
+				BdApi.showToast(`Value must not be lower than ${minimum}`, {type: "error"});
+			}
+		});
+		return out;
 	},
 
 	newLabel: (text = "") => {
