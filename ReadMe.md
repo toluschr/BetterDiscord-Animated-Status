@@ -3,12 +3,12 @@
 * [Installation](#Installation)
 * [Usage](#Usage)
 * [Settings](#Settings)
-	* [Timeout](#Timeout)
-	* [The Editor](#The-Editor)
-	* [Emojis](#Emojis)
-		* [Regular Emoji](#Regular-Emoji)
-		* [Nitro Emoji](#Nitro-Emoji)
-	* [Custom JavasSript](#Custom-JavaScript)
+  * [Timeout](#Timeout)
+  * [The Editor](#The-Editor)
+  * [Emojis](#Emojis)
+    * [Regular Emoji](#Regular-Emoji)
+    * [Nitro Emoji](#Nitro-Emoji)
+  * [Custom JavaScript](#Custom-JavaScript)
 
 ## Installation
 Install using the very convenient [BetterDiscord installer](https://github.com/BetterDiscord/Installer/releases/latest) \
@@ -72,5 +72,5 @@ eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.g
 ```
 Have the current time with the corresponding clock symbol as your current status
 ```
-eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;", "eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)];
+eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;, eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)];
 ```
