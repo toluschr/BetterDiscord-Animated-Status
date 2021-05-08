@@ -8,7 +8,7 @@
   * [Emojis](#Emojis)
     * [Regular Emoji](#Regular-Emoji)
     * [Nitro Emoji](#Nitro-Emoji)
-  * [Custom JavaScript](#Custom-JavaScript)
+  * [Examples](#Examples)
 
 ## Installation
 Install using the very convenient [BetterDiscord installer](https://github.com/BetterDiscord/Installer/releases/latest) \
@@ -65,7 +65,8 @@ Due to uncertainties about nitro emoji names, the plugin does currently not auto
 - Edit the settings accordingly \
   <img src="Screenshots/nitro3.png">
 
-### Custom JavaScript
+### Examples
+Some screenshots are sped up, so the ReadMe looks more appealing.
 
 #### Clock
 - **Result:** \
