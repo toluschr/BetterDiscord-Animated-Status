@@ -66,11 +66,17 @@ Due to uncertainties about nitro emoji names, the plugin does currently not auto
   <img src="Screenshots/nitro3.png">
 
 ### Custom JavaScript
-Have the current time as your status:
-```
-eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;
-```
-Have the current time with the corresponding clock symbol as your current status
-```
-eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`;, eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)];
-```
+
+#### Clock
+- **Result:** \
+  <img src="Screenshots/JS_Clock.gif">
+- **Emoji-Field:** \
+  <code> eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)]; </code>
+
+#### Clock And Text
+- **Result:** \
+  <img src="Screenshots/JS_ClockText.png">
+- **Emoji-Field:** \
+  <code> eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)]; </code>
+- **Text-Field:** \
+  <code> eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`; </code>
