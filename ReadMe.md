@@ -1,5 +1,7 @@
 # BetterDiscord-Animated-Status
 
+## Try out the pre-release! ([click here](https://github.com/toluschr/BetterDiscord-Animated-Status/tree/optional-text))
+
 <!-- vim-markdown-toc GFM -->
 
 * [Installation](#installation)
