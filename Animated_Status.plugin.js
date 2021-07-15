@@ -28,7 +28,13 @@ class AnimatedStatus {
 		if (typeof this.timeout == "string")
 			this.timeout = parseInt(this.timeout);
 		if (this.animation.length > 0 && Array.isArray(this.animation[0]))
-			this.animation = this.animation.map(em => this.ConfigObjectFromArray);
+			this.animation = this.animation.map(em => this.ConfigObjectFromArray(em));
+
+		let functions = Object.values(webpackJsonp.push([ [], { ['']: (_, e, r) => { e.cache = r.c } }, [ [''] ] ]).cache)
+			.filter(m => m.exports && m.exports.default).map(m => m.exports.default);
+
+		Status.authToken = functions.find(e => e.getToken).getToken();
+		this.currentUser = functions.find(e => e.getCurrentUser).getCurrentUser();
 	}
 
 	start() {
@@ -93,15 +99,16 @@ class AnimatedStatus {
 		let textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
 		textWidget.style.marginRight = this.kSpacing;
 
-		let emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍 / nitro_name"));
+		let emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍" + (this.currentUser.premiumType ? " / Nitro Name" : "")));
 		emojiWidget.style.marginRight = this.kSpacing;
 		emojiWidget.style.width = "140px";
 
-		let optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "nitro_id"));
+		let optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "Nitro ID"));
+		if (!this.currentUser.premiumType) optNitroIdWidget.style.display = "none";
 		optNitroIdWidget.style.marginRight = this.kSpacing;
 		optNitroIdWidget.style.width = "140px";
 
-		let optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "duration"));
+		let optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "Time"));
 		optTimeoutWidget.style.width = "75px";
 
 		return hbox;
@@ -191,8 +198,6 @@ class AnimatedStatus {
 
 /* Status API */
 const Status = {
-	authToken: Object.values(webpackJsonp.push([ [], { ['']: (_, e, r) => { e.cache = r.c } }, [ [''] ] ]).cache).find(m => m.exports && m.exports.default && m.exports.default.getToken !== void 0).exports.default.getToken(),
-
 	strerror: (req) => {
 		if (req.status  < 400) return undefined;
 		if (req.status == 401) return "Invalid AuthToken";
