@@ -75,7 +75,7 @@ class AnimatedStatus {
 		}
 	}
 
-	AnimationLoop(i = 0) {
+	async AnimationLoop(i = 0) {
 		i %= this.animation.length;
 		// Every loop needs its own shouldContinue variable, otherwise there
 		// is the possibility of multiple loops running simultaneously
@@ -188,8 +188,8 @@ class AnimatedStatus {
 			BdApi.showToast("Settings were saved!", {type: "success"});
 
 			// Restart
-			this.load();
 			this.stop();
+			this.load();
 			this.start();
 		};
 
