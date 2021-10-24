@@ -168,8 +168,19 @@ class AnimatedStatus {
 		// Move save to the right (XXX make use of flexbox)
 		actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
 
+		// Report Issue
+		let reportIssue = actions.appendChild(GUI.newButton('Report Issue'));
+		reportIssue.onclick = () => {
+			let discordVersion = BdApi.findModule(m => m.default && m.default.version).default.version.join('.');
+			let discordRelease = BdApi.findModule(m => m.default && m.default.releaseChannel).default.releaseChannel;
+			let title = encodeURIComponent(`[BD-${BdApi.version}_${discordVersion}-${discordRelease}_${this.getVersion()}] ...`);
+
+			window.open(`https://github.com/toluschr/BetterDiscord-Animated-Status/issues/new?assignees=toluschr&labels=help+wanted&template=i-need-help.md&title=${title}`, "_blank");
+		};
+
 		// Save
 		let save = actions.appendChild(GUI.newButton("Save"));
+		save.style.marginLeft = this.kSpacing;
 		GUI.setSuggested(save, true);
 		save.onclick = () => {
 			try {
@@ -205,7 +216,7 @@ const Status = {
 		let json = JSON.parse(req.response);
 		for (const s of ["errors", "custom_status", "text", "_errors", 0, "message"])
 			if ((json == undefined) || ((json = json[s]) == undefined))
-				return "Unknown. Report at github.com/toluschr/BetterDiscord-Animated-Status";
+				return "Unknown error. Please go to plugin settings, click 'Report Issue' and fill out the form.";
 
 		return json;
 	},
