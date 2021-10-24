@@ -30,11 +30,8 @@ class AnimatedStatus {
 		if (this.animation.length > 0 && Array.isArray(this.animation[0]))
 			this.animation = this.animation.map(em => this.ConfigObjectFromArray(em));
 
-		let functions = Object.values(webpackJsonp.push([ [], { ['']: (_, e, r) => { e.cache = r.c } }, [ [''] ] ]).cache)
-			.filter(m => m.exports && m.exports.default).map(m => m.exports.default);
-
-		Status.authToken = functions.find(e => e.getToken).getToken();
-		this.currentUser = functions.find(e => e.getCurrentUser).getCurrentUser();
+		Status.authToken = BdApi.findModule(m => m.default && m.default.getToken).default.getToken();
+		this.currentUser = BdApi.findModule(m => m.default && m.default.getCurrentUser).default.getCurrentUser();
 	}
 
 	start() {
