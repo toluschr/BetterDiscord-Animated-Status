@@ -83,9 +83,10 @@ class AnimatedStatus {
 		Promise.all([this.ResolveStatusField(this.animation[i].text),
 		             this.ResolveStatusField(this.animation[i].emoji_name),
 		             this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
+			Status.Set(this.ConfigObjectFromArray(p));
 			this.cancel = undefined;
+
 			if (shouldContinue) {
-				Status.Set(this.ConfigObjectFromArray(p));
 				let timeout = this.animation[i].timeout || this.timeout;
 				this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, timeout);
 			}
