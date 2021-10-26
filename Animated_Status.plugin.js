@@ -45,7 +45,7 @@ class AnimatedStatus {
 		if (this.cancel) {
 			this.cancel();
 		} else {
-			while (this.animation.length && this.loop == undefined);
+			console.assert(this.loop != undefined);
 			clearTimeout(this.loop);
 		}
 		Status.Set(null);
@@ -72,7 +72,7 @@ class AnimatedStatus {
 		}
 	}
 
-	async AnimationLoop(i = 0) {
+	AnimationLoop(i = 0) {
 		i %= this.animation.length;
 		// Every loop needs its own shouldContinue variable, otherwise there
 		// is the possibility of multiple loops running simultaneously
@@ -95,6 +95,7 @@ class AnimatedStatus {
 
 	NewEditorRow({text, emoji_name, emoji_id, timeout} = {}) {
 		let hbox = GUI.newHBox();
+		hbox.style.marginBottom = this.kSpacing;
 
 		let textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
 		textWidget.style.marginRight = this.kSpacing;
@@ -111,14 +112,74 @@ class AnimatedStatus {
 		let optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "Time"));
 		optTimeoutWidget.style.width = "75px";
 
+		hbox.onkeydown = (e) => {
+			let activeContainer = document.activeElement.parentNode;
+			let activeIndex = Array.from(activeContainer.children).indexOf(document.activeElement);
+			console.log(e);
+
+			let keymaps = {
+				"Delete": [
+					[[false, true], () => {
+						activeContainer = hbox.nextSibling || hbox.previousSibling;
+						hbox.parentNode.removeChild(hbox);
+					}],
+				],
+
+				"ArrowDown": [
+					[[true, true], () => {
+						activeContainer = this.NewEditorRow();
+						hbox.parentNode.insertBefore(activeContainer, hbox.nextSibling);
+					}],
+					[[false, true], () => {
+						let next = hbox.nextSibling;
+						if (next != undefined) {
+							next.replaceWith(hbox);
+							hbox.parentNode.insertBefore(next, hbox);
+						}
+					}],
+					[[false, false], () => {
+						activeContainer = hbox.nextSibling;
+					}],
+				],
+
+				"ArrowUp": [
+					[[true, true], () => {
+						activeContainer = this.NewEditorRow();
+						hbox.parentNode.insertBefore(activeContainer, hbox);
+					}],
+					[[false, true], () => {
+						let prev = hbox.previousSibling;
+						if (prev != undefined) {
+							prev.replaceWith(hbox);
+							hbox.parentNode.insertBefore(prev, hbox.nextSibling);
+						}
+					}],
+					[[false, false], () => {
+						activeContainer = hbox.previousSibling;
+					}],
+				],
+			};
+
+			let letter = keymaps[e.key];
+			if (letter == undefined) return;
+
+			for (let i = 0; i < letter.length; i++) {
+				if (letter[i][0][0] != e.ctrlKey || letter[i][0][1] != e.shiftKey)
+					continue;
+
+				letter[i][1]();
+				if (activeContainer) activeContainer.children[activeIndex].focus();
+				e.preventDefault();
+				return;
+			}
+		};
 		return hbox;
 	}
 
 	EditorFromJSON(json) {
 		let out = document.createElement("div");
 		for (let i = 0; i < json.length; i++) {
-			let row = out.appendChild(this.NewEditorRow(json[i]));
-			if (i) row.style.marginTop = "15px";
+			out.appendChild(this.NewEditorRow(json[i]));
 		}
 		return out;
 	}
@@ -149,16 +210,11 @@ class AnimatedStatus {
 
 		// Actions
 		let actions = settings.appendChild(GUI.newHBox());
-		actions.style.marginTop = this.kSpacing;
 
 		// Add Step
 		let addStep = actions.appendChild(GUI.setSuggested(GUI.newButton("+", false)));
 		addStep.title = "Add step to end";
-		addStep.onclick = () => {
-			let row = edit.appendChild(this.NewEditorRow());
-			if (edit.childNodes.length > 1)
-				row.style.marginTop = this.kSpacing;
-		}
+		addStep.onclick = () => edit.appendChild(this.NewEditorRow());
 
 		// Del Step
 		let delStep = actions.appendChild(GUI.setDestructive(GUI.newButton("-", false)));
@@ -222,7 +278,7 @@ const Status = {
 		return json;
 	},
 
-	Set: (status) => {
+	Set: async (status) => {
 		let req = new XMLHttpRequest();
 		req.open("PATCH", "/api/v9/users/@me/settings", true);
 		req.setRequestHeader("authorization", Status.authToken);
