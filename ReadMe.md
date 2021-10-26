@@ -12,7 +12,7 @@
 
 ## Installation
 Install using the very convenient [BetterDiscord installer](https://github.com/BetterDiscord/Installer/releases/latest) \
-Download [animated-status.plugin.js](/animated-status.plugin.js?raw=true) into the following directory \
+Download [Animated_Status.plugin.js](/Animated_Status.plugin.js?raw=true) into the following directory \
 Mac: `~/Library/Preferences/BetterDiscord`\
 Windows: `%appdata%\BetterDiscord\plugins`\
 Linux: `~/.config/BetterDiscord/plugins`
