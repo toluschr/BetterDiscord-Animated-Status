@@ -3,7 +3,7 @@
 class AnimatedStatus {
 	/* BD functions */
 	getName() { return "Animated Status"; }
-	getVersion() { return "0.12.0"; }
+	getVersion() { return "0.13.0"; }
 	getAuthor() { return "toluschr"; }
 	getDescription() { return "Animate your Discord status"; }
 
