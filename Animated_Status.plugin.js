@@ -115,7 +115,6 @@ class AnimatedStatus {
 		hbox.onkeydown = (e) => {
 			let activeContainer = document.activeElement.parentNode;
 			let activeIndex = Array.from(activeContainer.children).indexOf(document.activeElement);
-			console.log(e);
 
 			let keymaps = {
 				"Delete": [
@@ -228,7 +227,7 @@ class AnimatedStatus {
 		// Report Issue
 		let reportIssue = actions.appendChild(GUI.newButton('Report Issue'));
 		reportIssue.onclick = () => {
-			let discordVersion = BdApi.findModule(m => m.default && m.default.version).default.version.join('.');
+			let discordVersion = BdApi.findAllModules(m => m.default && m.default.version)[1].default.version.join('.');
 			let discordRelease = BdApi.findModule(m => m.default && m.default.releaseChannel).default.releaseChannel;
 			let title = encodeURIComponent(`[BD-${BdApi.version}_${discordVersion}-${discordRelease}_${this.getVersion()}] ...`);
 
