@@ -4,7 +4,7 @@ labels: [help wanted]
 body:
   - type: markdown
     attributes:
-      value: "_Before reporting:_ Search for existing issues, *read the readme thoroughly*"
+      value: "_Before reporting:_ Search for existing issues, **read the readme thoroughly**"
 
   - type: checkboxes
     attributes:
