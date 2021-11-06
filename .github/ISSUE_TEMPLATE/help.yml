@@ -1,0 +1,27 @@
+name: I Need Help
+description: There is a Bug / Unexpected Behavior in the plugin
+labels: [help wanted]
+body:
+  - type: markdown
+    attributes:
+      value: "_Before reporting:_ Search for existing issues, *read the readme thoroughly*"
+
+  - type: checkboxes
+    attributes:
+      label: Notice taken
+      options:
+        - label: "I followed the instructions above before opening this issue"
+          required: true
+
+  - type: input
+    attributes:
+      label: "Plugin Version"
+      description: "Which Plugin version are you using? (Under Settings>Plugins>Animated Status)"
+      placeholder: "i.e. 0.13.0"
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: "What did not work?"
+      description: "Please describe in detail, what you expected to happen"
