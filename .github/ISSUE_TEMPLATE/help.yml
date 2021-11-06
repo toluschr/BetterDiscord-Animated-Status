@@ -1,5 +1,5 @@
 name: I Need Help
-description: There is a Bug / Unexpected Behavior in the plugin
+description: I need help working with the plugin / something does not work as anticipated
 labels: [help wanted]
 body:
   - type: markdown
