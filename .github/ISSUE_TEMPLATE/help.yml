@@ -23,5 +23,5 @@ body:
 
   - type: textarea
     attributes:
-      label: "What did not work?"
-      description: "Please describe in detail, what you expected to happen"
+      label: "What do you need help with?"
+      description: "Please describe in detail, what you need help with"
