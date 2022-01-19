@@ -23,6 +23,7 @@ class AnimatedStatus {
 
 		this.animation = this.GetData("animation") || [];
 		this.timeout = this.GetData("timeout") || this.kMinTimeout;
+		this.randomize = this.GetData("randomize") || false;
 
 		// Import Older Config Files
 		if (typeof this.timeout == "string")
@@ -74,6 +75,7 @@ class AnimatedStatus {
 
 	AnimationLoop(i = 0) {
 		i %= this.animation.length;
+
 		// Every loop needs its own shouldContinue variable, otherwise there
 		// is the possibility of multiple loops running simultaneously
 		let shouldContinue = true;
@@ -88,7 +90,12 @@ class AnimatedStatus {
 
 			if (shouldContinue) {
 				let timeout = this.animation[i].timeout || this.timeout;
-				this.loop = setTimeout(() => { this.AnimationLoop(i + 1); }, timeout);
+				this.loop = setTimeout(() => {
+					if (this.randomize) {
+						i += Math.floor(Math.random() * (this.animation.length - 2));
+					}
+					this.AnimationLoop(i + 1);
+				}, timeout);
 			}
 		});
 	}
@@ -230,6 +237,7 @@ class AnimatedStatus {
 		save.onclick = () => {
 			try {
 				// Set timeout
+				this.SetData("randomize", this.randomize);
 				this.SetData("timeout", parseInt(timeout.value));
 				this.SetData("animation", this.JSONFromEditor(edit));
 			} catch (e) {
