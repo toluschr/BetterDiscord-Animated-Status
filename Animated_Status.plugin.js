@@ -3,7 +3,7 @@
 class AnimatedStatus {
 	/* BD functions */
 	getName() { return "Animated Status"; }
-	getVersion() { return "0.13.1"; }
+	getVersion() { return "0.13.2"; }
 	getAuthor() { return "toluschr"; }
 	getDescription() { return "Animate your Discord status"; }
 
@@ -285,7 +285,7 @@ const Status = {
 const GUI = {
 	newInput: (text = "", placeholder = "") => {
 		let input = document.createElement("input");
-		input.className = "inputDefault-_djjkz input-cIJ7To";
+		input.className = "inputDefault-3FGxgL input-2g-os5";
 		input.value = String(text);
 		input.placeholder = String(placeholder);
 		return input;
@@ -305,16 +305,16 @@ const GUI = {
 
 	newLabel: (text = "") => {
 		let label = document.createElement("h5");
-		label.className = "h5-18_1nd";
+		label.className = "h5-2RwDNl";
 		label.innerText = String(text);
 		return label;
 	},
 
 	newButton: (text, filled = true) => {
 		let button = document.createElement("button");
-		button.className = "button-38aScr colorBrand-3pXr91 sizeSmall-2cSMqn grow-q77ONN";
-		if (filled) button.classList.add("lookFilled-1Gx00P");
-		else button.classList.add("lookOutlined-3sRXeN");
+		button.className = "button-f2h6uQ colorBrand-I6CyqQ sizeSmall-wU2dO- grow-2sR_-F";
+		if (filled) button.classList.add("lookFilled-yCfaCM");
+		else button.classList.add("lookOutlined-3yKVGo");
 		button.innerText = String(text);
 		return button;
 	},
@@ -332,14 +332,14 @@ const GUI = {
 	},
 
 	setSuggested: (element, value = true) => {
-		if (value) element.classList.add("colorGreen-29iAKY");
-		else element.classList.remove("mystyle");
+		if (value) element.classList.add("colorGreen-3y-Z79");
+		else element.classList.remove("colorGreen-3y-Z79");
 		return element;
 	},
 
 	setDestructive: (element, value = true) => {
-		if (value) element.classList.add("colorRed-1TFJan");
-		else element.classList.remove("colorRed-1TFJan");
+		if (value) element.classList.add("colorRed-rQXKgM");
+		else element.classList.remove("colorRed-rQXKgM");
 		return element;
 	}
 };
