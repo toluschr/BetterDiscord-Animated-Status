@@ -80,4 +80,12 @@ Some screenshots are sped up, so the ReadMe looks more appealing.
 - **Emoji-Field:** \
   <code> eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)]; </code>
 - **Text-Field:** \
-  <code> eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`; </code>
+  <code> eval new Date().toLocaleTimeString("en-US", {hourCycle:"h24",hour:"numeric",minute:"2-digit",second:"2-digit"}); </code>
+
+#### Text
+- **Text-Field:** \
+  <code> eval new Date().toLocaleTimeString("en-US", {hourCycle:"h24",hour:"numeric",minute:"2-digit",second:"2-digit"}); </code>
+
+#### Custom Time Text
+- **Text-Field:** \
+  <code> eval var time = new Date().toLocaleTimeString("en-US", {hourCycle:"h24",hour:"numeric",minute:"2-digit",second:"2-digit"});`The time is currently ${time} for me!`; </code>
