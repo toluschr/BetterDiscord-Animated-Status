@@ -25,14 +25,20 @@ class AnimatedStatus {
 		this.timeout = this.GetData("timeout") || this.kMinTimeout;
 		this.randomize = this.GetData("randomize") || false;
 
+		this.modules = this.modules || (() => {
+			let m = []
+			webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => { m = m.concat(Object.values(e.c)) }])
+			return m
+		})();
+
 		// Import Older Config Files
 		if (typeof this.timeout == "string")
 			this.timeout = parseInt(this.timeout);
 		if (this.animation.length > 0 && Array.isArray(this.animation[0]))
 			this.animation = this.animation.map(em => this.ConfigObjectFromArray(em));
 
-		Status.authToken = BdApi.findModule(m => m.default && m.default.getToken).default.getToken();
-		this.currentUser = BdApi.findModule(m => m.default && m.default.getCurrentUser).default.getCurrentUser();
+		Status.authToken = this.modules.find(m => m.exports?.default?.getToken !== void 0).exports.default.getToken();
+		this.currentUser = this.modules.find(m => m.exports?.default?.getCurrentUser !== void 0).exports.default.getCurrentUser();
 	}
 
 	start() {
