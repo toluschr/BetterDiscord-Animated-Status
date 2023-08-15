@@ -80,4 +80,4 @@ Some screenshots are sped up, so the ReadMe looks more appealing.
 - **Emoji-Field:** \
   <code> eval ['🕛','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚'][((new Date()).getHours()%12)]; </code>
 - **Text-Field:** \
-  <code> eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}`; </code>
+  <code> eval let fmt=t=>(t<10?'0':'')+t;let d=new Date();\`${fmt(d.getHours())}:${fmt(d.getMinutes())}:${fmt(d.getSeconds())}\`; </code>
