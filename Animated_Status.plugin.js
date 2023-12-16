@@ -1,359 +1,348 @@
 //META{"name":"AnimatedStatus","source":"https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js","website":"https://github.com/toluschr/BetterDiscord-Animated-Status"}*//
 
 class AnimatedStatus {
-	/* BD functions */
-	getName() { return "Animated Status"; }
-	getVersion() { return "0.13.2"; }
-	getAuthor() { return "toluschr"; }
-	getDescription() { return "Animate your Discord status"; }
+  constructor() {
+    this.kSpacing = "15px";
+    this.kMinTimeout = 2900;
+    this.cancel = undefined;
 
-	SetData(key, value) {
-		BdApi.setData("AnimatedStatus", key, value);
-	}
+    this.animation = this.getData("animation") || [];
+    this.timeout = this.getData("timeout") || this.kMinTimeout;
+    this.randomize = this.getData("randomize") || false;
 
-	GetData(key) {
-		return BdApi.getData("AnimatedStatus", key);
-	}
+    this.modules = (() => {
+      let m = [];
+      webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
+        m = m.concat(Object.values(e.c || {}));
+      }]);
+      return m;
+    })();
 
-	/* Code related to Animations */
-	load() {
-		this.kSpacing = "15px";
-		this.kMinTimeout = 2900;
-		this.cancel = undefined;
+    this.status = {
+      authToken: this.modules.find(m => m.exports?.default?.getToken !== void 0).exports.default.getToken(),
+      currentUser: this.modules.find(m => m.exports?.default?.getCurrentUser !== void 0).exports.default.getCurrentUser()
+    };
+  }
 
-		this.animation = this.GetData("animation") || [];
-		this.timeout = this.GetData("timeout") || this.kMinTimeout;
-		this.randomize = this.GetData("randomize") || false;
+  getName() { return "Animated Status"; }
+  getVersion() { return "0.13.3"; }
+  getAuthor() { return "toluschr, SirSlender"; }
+  getDescription() { return "Animate your Discord status"; }
 
-		this.modules = this.modules || (() => {
-			let m = []
-			webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => { m = m.concat(Object.values(e.c)) }])
-			return m
-		})();
+  setData(key, value) {
+    BdApi.setData("AnimatedStatus", key, value);
+  }
 
-		// Import Older Config Files
-		if (typeof this.timeout == "string")
-			this.timeout = parseInt(this.timeout);
-		if (this.animation.length > 0 && Array.isArray(this.animation[0]))
-			this.animation = this.animation.map(em => this.ConfigObjectFromArray(em));
+  getData(key) {
+    return BdApi.getData("AnimatedStatus", key);
+  }
 
-		Status.authToken = this.modules.find(m => m.exports?.default?.getToken !== void 0).exports.default.getToken();
-		this.currentUser = this.modules.find(m => m.exports?.default?.getCurrentUser !== void 0).exports.default.getCurrentUser();
-	}
+  load() {
+    this.modules = this.modules || (() => {
+      let m = [];
+      webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
+        m = m.concat(Object.values(e.c || {}));
+      }]);
+      return m;
+    })();
+  }
 
-	start() {
-		if (this.animation.length == 0)
-			BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
-		else
-			this.AnimationLoop();
-	}
+  start() {
+    if (this.animation.length === 0) {
+      BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
+    } else {
+      this.animationLoop();
+    }
+  }
 
-	stop() {
-		if (this.cancel) {
-			this.cancel();
-		} else {
-			console.assert(this.loop != undefined);
-			clearTimeout(this.loop);
-		}
-		Status.Set(null);
-	}
+  stop() {
+    if (this.cancel) {
+      this.cancel();
+    } else {
+      console.assert(this.loop !== undefined);
+      clearTimeout(this.loop);
+    }
+    this.setStatus(null);
+  }
 
-	ConfigObjectFromArray(arr) {
-		let data = {};
-		if (arr[0] !== undefined && arr[0].length > 0) data.text       = arr[0];
-		if (arr[1] !== undefined && arr[1].length > 0) data.emoji_name = arr[1];
-		if (arr[2] !== undefined && arr[2].length > 0) data.emoji_id   = arr[2];
-		if (arr[3] !== undefined && arr[3].length > 0) data.timeout    = parseInt(arr[3]);
-		return data;
-	}
+  configObjectFromArray(arr) {
+    const data = {};
+    if (arr[0] !== undefined && arr[0].length > 0) data.text = arr[0];
+    if (arr[1] !== undefined && arr[1].length > 0) data.emoji_name = arr[1];
+    if (arr[2] !== undefined && arr[2].length > 0) data.emoji_id = arr[2];
+    if (arr[3] !== undefined && arr[3].length > 0) data.timeout = parseInt(arr[3]);
+    return data;
+  }
 
-	async ResolveStatusField(text = "") {
-		let evalPrefix = "eval ";
-		if (!text.startsWith(evalPrefix)) return text;
+  async resolveStatusField(text = "") {
+    const evalPrefix = "eval ";
+    if (!text.startsWith(evalPrefix)) return text;
 
-		try {
-			return eval(text.substr(evalPrefix.length));
-		} catch (e) {
-			BdApi.showToast(e, {type: "error"});
-			return "";
-		}
-	}
+    try {
+      return eval(text.substr(evalPrefix.length));
+    } catch (e) {
+      BdApi.showToast(e, { type: "error" });
+      return "";
+    }
+  }
 
-	AnimationLoop(i = 0) {
-		i %= this.animation.length;
+  animationLoop(i = 0) {
+    i %= this.animation.length;
 
-		// Every loop needs its own shouldContinue variable, otherwise there
-		// is the possibility of multiple loops running simultaneously
-		let shouldContinue = true;
-		this.loop = undefined;
-		this.cancel = () => { shouldContinue = false; };
+    let shouldContinue = true;
+    this.loop = undefined;
+    this.cancel = () => { shouldContinue = false; };
 
-		Promise.all([this.ResolveStatusField(this.animation[i].text),
-		             this.ResolveStatusField(this.animation[i].emoji_name),
-		             this.ResolveStatusField(this.animation[i].emoji_id)]).then(p => {
-			Status.Set(this.ConfigObjectFromArray(p));
-			this.cancel = undefined;
+    Promise.all([
+      this.resolveStatusField(this.animation[i].text),
+      this.resolveStatusField(this.animation[i].emoji_name),
+      this.resolveStatusField(this.animation[i].emoji_id)
+    ]).then(p => {
+      this.setStatus(this.configObjectFromArray(p));
+      this.cancel = undefined;
 
-			if (shouldContinue) {
-				let timeout = this.animation[i].timeout || this.timeout;
-				this.loop = setTimeout(() => {
-					if (this.randomize) {
-						i += Math.floor(Math.random() * (this.animation.length - 2));
-					}
-					this.AnimationLoop(i + 1);
-				}, timeout);
-			}
-		});
-	}
+      if (shouldContinue) {
+        const timeout = this.animation[i].timeout || this.timeout;
+        this.loop = setTimeout(() => {
+          if (this.randomize) {
+            i += Math.floor(Math.random() * (this.animation.length - 2));
+          }
+          this.animationLoop(i + 1);
+        }, timeout);
+      }
+    });
+  }
 
-	NewEditorRow({text, emoji_name, emoji_id, timeout} = {}) {
-		let hbox = GUI.newHBox();
-		hbox.style.marginBottom = this.kSpacing;
+  newEditorRow({ text, emoji_name, emoji_id, timeout } = {}) {
+    const hbox = GUI.newHBox();
+    hbox.style.marginBottom = this.kSpacing;
 
-		let textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
-		textWidget.style.marginRight = this.kSpacing;
+    const textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
+    textWidget.style.marginRight = this.kSpacing;
 
-		let emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍" + (this.currentUser.premiumType ? " / Nitro Name" : "")));
-		emojiWidget.style.marginRight = this.kSpacing;
-		emojiWidget.style.width = "140px";
+    const emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍" + (this.status.currentUser.premiumType ? " / Nitro Name" : "")));
+    emojiWidget.style.marginRight = this.kSpacing;
+    emojiWidget.style.width = "140px";
 
-		let optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "Nitro ID"));
-		if (!this.currentUser.premiumType) optNitroIdWidget.style.display = "none";
-		optNitroIdWidget.style.marginRight = this.kSpacing;
-		optNitroIdWidget.style.width = "140px";
+    const optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "Nitro ID"));
+    if (!this.status.currentUser.premiumType) optNitroIdWidget.style.display = "none";
+    optNitroIdWidget.style.marginRight = this.kSpacing;
+    optNitroIdWidget.style.width = "140px";
 
-		let optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "Time"));
-		optTimeoutWidget.style.width = "75px";
+    const optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "Time"));
+    optTimeoutWidget.style.width = "75px";
 
-		hbox.onkeydown = (e) => {
-			let activeContainer = document.activeElement.parentNode;
-			let activeIndex = Array.from(activeContainer.children).indexOf(document.activeElement);
+    hbox.onkeydown = (e) => {
+      const activeContainer = document.activeElement.parentNode;
+      const activeIndex = Array.from(activeContainer.children).indexOf(document.activeElement);
 
-			let keymaps = {
-				"Delete": [
-					[[false, true], () => {
-						activeContainer = hbox.nextSibling || hbox.previousSibling;
-						hbox.parentNode.removeChild(hbox);
-					}],
-				],
+      const keymaps = {
+        "Delete": [
+          [[false, true], () => {
+            const next = hbox.nextSibling || hbox.previousSibling;
+            hbox.parentNode.removeChild(hbox);
+          }],
+        ],
 
-				"ArrowDown": [
-					[[true, true], () => {
-						activeContainer = this.NewEditorRow();
-						hbox.parentNode.insertBefore(activeContainer, hbox.nextSibling);
-					}],
-					[[false, true], () => {
-						let next = hbox.nextSibling;
-						if (next != undefined) {
-							next.replaceWith(hbox);
-							hbox.parentNode.insertBefore(next, hbox);
-						}
-					}],
-					[[false, false], () => {
-						activeContainer = hbox.nextSibling;
-					}],
-				],
+        "ArrowDown": [
+          [[true, true], () => {
+            const activeContainer = this.newEditorRow();
+            hbox.parentNode.insertBefore(activeContainer, hbox.nextSibling);
+          }],
+          [[false, true], () => {
+            const next = hbox.nextSibling;
+            if (next !== undefined) {
+              next.replaceWith(hbox);
+              hbox.parentNode.insertBefore(next, hbox);
+            }
+          }],
+          [[false, false], () => {
+            const activeContainer = hbox.nextSibling;
+          }],
+        ],
 
-				"ArrowUp": [
-					[[true, true], () => {
-						activeContainer = this.NewEditorRow();
-						hbox.parentNode.insertBefore(activeContainer, hbox);
-					}],
-					[[false, true], () => {
-						let prev = hbox.previousSibling;
-						if (prev != undefined) {
-							prev.replaceWith(hbox);
-							hbox.parentNode.insertBefore(prev, hbox.nextSibling);
-						}
-					}],
-					[[false, false], () => {
-						activeContainer = hbox.previousSibling;
-					}],
-				],
-			};
+        "ArrowUp": [
+          [[true, true], () => {
+            const activeContainer = this.newEditorRow();
+            hbox.parentNode.insertBefore(activeContainer, hbox);
+          }],
+          [[false, true], () => {
+            const prev = hbox.previousSibling;
+            if (prev !== undefined) {
+              prev.replaceWith(hbox);
+              hbox.parentNode.insertBefore(prev, hbox.nextSibling);
+            }
+          }],
+          [[false, false], () => {
+            const activeContainer = hbox.previousSibling;
+          }],
+        ],
+      };
 
-			let letter = keymaps[e.key];
-			if (letter == undefined) return;
+      const letter = keymaps[e.key];
+      if (letter === undefined) return;
 
-			for (let i = 0; i < letter.length; i++) {
-				if (letter[i][0][0] != e.ctrlKey || letter[i][0][1] != e.shiftKey)
-					continue;
+      for (let i = 0; i < letter.length; i++) {
+        if (letter[i][0][0] !== e.ctrlKey || letter[i][0][1] !== e.shiftKey)
+          continue;
 
-				letter[i][1]();
-				if (activeContainer) activeContainer.children[activeIndex].focus();
-				e.preventDefault();
-				return;
-			}
-		};
-		return hbox;
-	}
+        letter[i][1]();
+        if (activeContainer) activeContainer.children[activeIndex].focus();
+        e.preventDefault();
+        return;
+      }
+    };
+    return hbox;
+  }
 
-	EditorFromJSON(json) {
-		let out = document.createElement("div");
-		for (let i = 0; i < json.length; i++) {
-			out.appendChild(this.NewEditorRow(json[i]));
-		}
-		return out;
-	}
+  editorFromJSON(json) {
+    const out = document.createElement("div");
+    for (let i = 0; i < json.length; i++) {
+      out.appendChild(this.newEditorRow(json[i]));
+    }
+    return out;
+  }
 
-	JSONFromEditor(editor) {
-		return Array.prototype.slice.call(editor.childNodes).map(row => {
-			return this.ConfigObjectFromArray(Array.prototype.slice.call(row.childNodes).map(e => e.value));
-		});
-	}
+  jsonFromEditor(editor) {
+    return Array.prototype.slice.call(editor.childNodes).map(row => {
+      return this.configObjectFromArray(Array.prototype.slice.call(row.childNodes).map(e => e.value));
+    });
+  }
 
-	// Settings
-	getSettingsPanel() {
-		let settings = document.createElement("div");
-		settings.style.padding = "10px";
+  getSettingsPanel() {
+    const settings = document.createElement("div");
+    settings.style.padding = "10px";
 
-		// timeout
-		settings.appendChild(GUI.newLabel("Step-Duration (3000: 3 seconds, 3500: 3.5 seconds, ...), overwritten by invididual steps"));
-		let timeout = settings.appendChild(GUI.newNumericInput(this.timeout, this.kMinTimeout));
-		timeout.style.marginBottom = this.kSpacing;
+    settings.appendChild(GUI.newLabel("Step-Duration (3000: 3 seconds, 3500: 3.5 seconds, ...), overwritten by individual steps"));
+    const timeout = settings.appendChild(GUI.newNumericInput(this.timeout, this.kMinTimeout));
+    timeout.style.marginBottom = this.kSpacing;
 
-		// Animation Container
-		settings.appendChild(GUI.newLabel("Animation"));
-		let animationContainer = settings.appendChild(document.createElement("div"));
-		animationContainer.marginBottom = this.kSpacing;
+    settings.appendChild(GUI.newLabel("Animation"));
+    const animationContainer = settings.appendChild(document.createElement("div"));
+    animationContainer.marginBottom = this.kSpacing;
 
-		// Editor
-		let edit = animationContainer.appendChild(this.EditorFromJSON(this.animation));
+    const edit = animationContainer.appendChild(this.editorFromJSON(this.animation));
 
-		// Actions
-		let actions = settings.appendChild(GUI.newHBox());
+    const actions = settings.appendChild(GUI.newHBox());
 
-		// Add Step
-		let addStep = actions.appendChild(GUI.setSuggested(GUI.newButton("+", false)));
-		addStep.title = "Add step to end";
-		addStep.onclick = () => edit.appendChild(this.NewEditorRow());
+    const addStep = actions.appendChild(GUI.setSuggested(GUI.newButton("+", false)));
+    addStep.title = "Add step to end";
+    addStep.onclick = () => edit.appendChild(this.newEditorRow());
 
-		// Del Step
-		let delStep = actions.appendChild(GUI.setDestructive(GUI.newButton("-", false)));
-		delStep.title = "Remove last step";
-		delStep.style.marginLeft = this.kSpacing;
-		delStep.onclick = () => edit.removeChild(edit.childNodes[edit.childNodes.length - 1]);
+    const delStep = actions.appendChild(GUI.setDestructive(GUI.newButton("-", false)));
+    delStep.title = "Remove last step";
+    delStep.style.marginLeft = this.kSpacing;
+    delStep.onclick = () => edit.removeChild(edit.childNodes[edit.childNodes.length - 1]);
 
-		// Move save to the right (XXX make use of flexbox)
-		actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
+    actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
 
-		// Save
-		let save = actions.appendChild(GUI.newButton("Save"));
-		GUI.setSuggested(save, true);
-		save.onclick = () => {
-			try {
-				// Set timeout
-				this.SetData("randomize", this.randomize);
-				this.SetData("timeout", parseInt(timeout.value));
-				this.SetData("animation", this.JSONFromEditor(edit));
-			} catch (e) {
-				BdApi.showToast(e, {type: "error"});
-				return;
-			}
+    const save = actions.appendChild(GUI.newButton("Save"));
+    GUI.setSuggested(save, true);
+    save.onclick = () => {
+      try {
+        this.setData("randomize", this.randomize);
+        this.setData("timeout", parseInt(timeout.value));
+        this.setData("animation", this.jsonFromEditor(edit));
+      } catch (e) {
+        BdApi.showToast(e, { type: "error" });
+        return;
+      }
 
-			// Show Toast
-			BdApi.showToast("Settings were saved!", {type: "success"});
+      BdApi.showToast("Settings were saved!", { type: "success" });
 
-			// Restart
-			this.stop();
-			this.load();
-			this.start();
-		};
+      this.stop();
+      this.load();
+      this.start();
+    };
 
-		// End
-		return settings;
-	}
+    return settings;
+  }
+
+  setStatus(status) {
+    const req = new XMLHttpRequest();
+    req.open("PATCH", "/api/v9/users/@me/settings", true);
+    req.setRequestHeader("authorization", this.status.authToken);
+    req.setRequestHeader("content-type", "application/json");
+    req.onload = () => {
+      const err = this.strError(req);
+      if (err !== undefined)
+        BdApi.showToast(`Animated Status: Error: ${err}`, { type: "error" });
+    };
+    if (status === {}) status = null;
+    req.send(JSON.stringify({ custom_status: status }));
+  }
+
+  strError(req) {
+    if (req.status < 400) return undefined;
+    if (req.status === 401) return "Invalid AuthToken";
+
+    let json = JSON.parse(req.response);
+    for (const s of ["errors", "custom_status", "text", "_errors", 0, "message"])
+      if ((json === undefined) || ((json = json[s]) === undefined))
+        return "Unknown error. Please report at github.com/toluschr/BetterDiscord-Animated-Status";
+
+    return json;
+  }
 }
 
-/* Status API */
-const Status = {
-	strerror: (req) => {
-		if (req.status  < 400) return undefined;
-		if (req.status == 401) return "Invalid AuthToken";
-
-		// Discord _sometimes_ returns an error message
-		let json = JSON.parse(req.response);
-		for (const s of ["errors", "custom_status", "text", "_errors", 0, "message"])
-			if ((json == undefined) || ((json = json[s]) == undefined))
-				return "Unknown error. Please report at github.com/toluschr/BetterDiscord-Animated-Status";
-
-		return json;
-	},
-
-	Set: async (status) => {
-		let req = new XMLHttpRequest();
-		req.open("PATCH", "/api/v9/users/@me/settings", true);
-		req.setRequestHeader("authorization", Status.authToken);
-		req.setRequestHeader("content-type", "application/json");
-		req.onload = () => {
-			let err = Status.strerror(req);
-			if (err != undefined)
-				BdApi.showToast(`Animated Status: Error: ${err}`, {type: "error"});
-		};
-		if (status === {}) status = null;
-		req.send(JSON.stringify({custom_status: status}));
-	},
-};
-
-// Used to easily style elements like the 'native' discord ones
 const GUI = {
-	newInput: (text = "", placeholder = "") => {
-		let input = document.createElement("input");
-		input.className = "inputDefault-3FGxgL input-2g-os5";
-		input.value = String(text);
-		input.placeholder = String(placeholder);
-		return input;
-	},
+  newInput: (text = "", placeholder = "") => {
+    const input = document.createElement("input");
+    input.className = "inputDefault-3FGxgL input-2g-os5";
+    input.value = String(text);
+    input.placeholder = String(placeholder);
+    return input;
+  },
 
-	newNumericInput: (text = "", minimum = 0, placeholder = "") => {
-		let out = GUI.newInput(text, placeholder);
-		out.setAttribute("type", "number");
-		out.addEventListener("focusout", () => {
-			if (parseInt(out.value) < minimum) {
-				out.value = String(minimum);
-				BdApi.showToast(`Value must not be lower than ${minimum}`, {type: "error"});
-			}
-		});
-		return out;
-	},
+  newNumericInput: (text = "", minimum = 0, placeholder = "") => {
+    const out = GUI.newInput(text, placeholder);
+    out.setAttribute("type", "number");
+    out.addEventListener("focusout", () => {
+      if (parseInt(out.value) < minimum) {
+        out.value = String(minimum);
+        BdApi.showToast(`Value must not be lower than ${minimum}`, { type: "error" });
+      }
+    });
+    return out;
+  },
 
-	newLabel: (text = "") => {
-		let label = document.createElement("h5");
-		label.className = "h5-2RwDNl";
-		label.innerText = String(text);
-		return label;
-	},
+  newLabel: (text = "") => {
+    const label = document.createElement("h5");
+    label.className = "h5-2RwDNl";
+    label.innerText = String(text);
+    return label;
+  },
 
-	newButton: (text, filled = true) => {
-		let button = document.createElement("button");
-		button.className = "button-f2h6uQ colorBrand-I6CyqQ sizeSmall-wU2dO- grow-2sR_-F";
-		if (filled) button.classList.add("lookFilled-yCfaCM");
-		else button.classList.add("lookOutlined-3yKVGo");
-		button.innerText = String(text);
-		return button;
-	},
+  newButton: (text, filled = true) => {
+    const button = document.createElement("button");
+    button.className = "button-f2h6uQ colorBrand-I6CyqQ sizeSmall-wU2dO- grow-2sR_-F";
+    if (filled) button.classList.add("lookFilled-yCfaCM");
+    else button.classList.add("lookOutlined-3yKVGo");
+    button.innerText = String(text);
+    return button;
+  },
 
-	newHBox: () => {
-		let hbox = document.createElement("div");
-		hbox.style.display = "flex";
-		hbox.style.flexDirection = "row";
-		return hbox;
-	},
+  newHBox: () => {
+    const hbox = document.createElement("div");
+    hbox.style.display = "flex";
+    hbox.style.flexDirection = "row";
+    return hbox;
+  },
 
-	setExpand: (element, value) => {
-		element.style.flexGrow = value;
-		return element;
-	},
+  setExpand: (element, value) => {
+    element.style.flexGrow = value;
+    return element;
+  },
 
-	setSuggested: (element, value = true) => {
-		if (value) element.classList.add("colorGreen-3y-Z79");
-		else element.classList.remove("colorGreen-3y-Z79");
-		return element;
-	},
+  setSuggested: (element, value = true) => {
+    if (value) element.classList.add("colorGreen-3y-Z79");
+    else element.classList.remove("colorGreen-3y-Z79");
+    return element;
+  },
 
-	setDestructive: (element, value = true) => {
-		if (value) element.classList.add("colorRed-rQXKgM");
-		else element.classList.remove("colorRed-rQXKgM");
-		return element;
-	}
+  setDestructive: (element, value = true) => {
+    if (value) element.classList.add("colorRed-rQXKgM");
+    else element.classList.remove("colorRed-rQXKgM");
+    return element;
+  }
 };
