@@ -25,6 +25,9 @@ class AnimatedStatus {
     this.timeout = this.getData("timeout") || this.kMinTimeout;
     this.randomize = this.getData("randomize") || false;
 
+    // https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/webpackmodules.js#L445
+    //
+    // Seems to load before the Module that exports getToken, so BdApi.Webpack can't be used
     this.modules = this.modules || (() => {
       let m = [];
       webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
