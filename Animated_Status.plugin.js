@@ -114,19 +114,16 @@ class AnimatedStatus {
   }
 
   newEditorRow({ text, emoji_name, emoji_id, timeout } = {}) {
-    const hbox = GUI.newHBox();
-    hbox.style.marginBottom = this.kSpacing;
+    const hbox = GUI.newHBox(this.kSpacing);
 
     const textWidget = hbox.appendChild(GUI.newInput(text, "Text"));
     textWidget.style.marginRight = this.kSpacing;
 
     const emojiWidget = hbox.appendChild(GUI.newInput(emoji_name, "👍" + (this.status.currentUser.premiumType ? " / Nitro Name" : "")));
-    emojiWidget.style.marginRight = this.kSpacing;
     emojiWidget.style.width = "140px";
 
     const optNitroIdWidget = hbox.appendChild(GUI.newInput(emoji_id, "Nitro ID"));
     if (!this.status.currentUser.premiumType) optNitroIdWidget.style.display = "none";
-    optNitroIdWidget.style.marginRight = this.kSpacing;
     optNitroIdWidget.style.width = "140px";
 
     const optTimeoutWidget = hbox.appendChild(GUI.newNumericInput(timeout, this.kMinTimeout, "Time"));
@@ -196,7 +193,7 @@ class AnimatedStatus {
   }
 
   editorFromJSON(json) {
-    const out = document.createElement("div");
+    const out = GUI.newVBox(this.kSpacing);
     for (let i = 0; i < json.length; i++) {
       out.appendChild(this.newEditorRow(json[i]));
     }
@@ -218,8 +215,9 @@ class AnimatedStatus {
     timeout.style.marginBottom = this.kSpacing;
 
     settings.appendChild(GUI.newLabel("Animation"));
+
     const animationContainer = settings.appendChild(document.createElement("div"));
-    animationContainer.marginBottom = this.kSpacing;
+    animationContainer.style.marginBottom = this.kSpacing;
 
     const edit = animationContainer.appendChild(this.editorFromJSON(this.animation));
 
@@ -288,7 +286,7 @@ class AnimatedStatus {
 const GUI = {
   newInput: (text = "", placeholder = "") => {
     const input = document.createElement("input");
-    input.className = "inputDefault-3FGxgL input-2g-os5";
+    input.className = "inputDefault__80165 input_d266e7";
     input.value = String(text);
     input.placeholder = String(placeholder);
     return input;
@@ -308,24 +306,33 @@ const GUI = {
 
   newLabel: (text = "") => {
     const label = document.createElement("h5");
-    label.className = "h5-2RwDNl";
+    label.className = "h5__884a2 eyebrow_b7df6b";
     label.innerText = String(text);
     return label;
   },
 
   newButton: (text, filled = true) => {
     const button = document.createElement("button");
-    button.className = "button-f2h6uQ colorBrand-I6CyqQ sizeSmall-wU2dO- grow-2sR_-F";
-    if (filled) button.classList.add("lookFilled-yCfaCM");
-    else button.classList.add("lookOutlined-3yKVGo");
+    button.className = "button_afdfd9 colorBrand_b2253e sizeMedium_c6fa98 grow__4c8a4";
+    if (filled) button.classList.add("lookFilled__19298");
+    else button.classList.add("lookOutlined__46d54");
     button.innerText = String(text);
     return button;
   },
 
-  newHBox: () => {
+  newHBox: (spacing) => {
     const hbox = document.createElement("div");
     hbox.style.display = "flex";
+    hbox.style.gap = spacing;
     hbox.style.flexDirection = "row";
+    return hbox;
+  },
+
+  newVBox: (spacing) => {
+    const hbox = document.createElement("div");
+    hbox.style.display = "flex";
+    hbox.style.gap = spacing;
+    hbox.style.flexDirection = "column";
     return hbox;
   },
 
@@ -335,14 +342,14 @@ const GUI = {
   },
 
   setSuggested: (element, value = true) => {
-    if (value) element.classList.add("colorGreen-3y-Z79");
-    else element.classList.remove("colorGreen-3y-Z79");
+    if (value) element.classList.add("colorGreen__5f181");
+    else element.classList.remove("colorGreen__5f181");
     return element;
   },
 
   setDestructive: (element, value = true) => {
-    if (value) element.classList.add("colorRed-rQXKgM");
-    else element.classList.remove("colorRed-rQXKgM");
+    if (value) element.classList.add("colorRed_d6b062");
+    else element.classList.remove("colorRed_d6b062");
     return element;
   }
 };
