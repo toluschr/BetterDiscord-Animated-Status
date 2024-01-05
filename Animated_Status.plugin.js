@@ -5,23 +5,6 @@ class AnimatedStatus {
     this.kSpacing = "15px";
     this.kMinTimeout = 2900;
     this.cancel = undefined;
-
-    this.animation = this.getData("animation") || [];
-    this.timeout = this.getData("timeout") || this.kMinTimeout;
-    this.randomize = this.getData("randomize") || false;
-
-    this.modules = (() => {
-      let m = [];
-      webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
-        m = m.concat(Object.values(e.c || {}));
-      }]);
-      return m;
-    })();
-
-    this.status = {
-      authToken: this.modules.find(m => m.exports?.default?.getToken !== void 0).exports.default.getToken(),
-      currentUser: this.modules.find(m => m.exports?.default?.getCurrentUser !== void 0).exports.default.getCurrentUser()
-    };
   }
 
   getName() { return "Animated Status"; }
@@ -38,6 +21,10 @@ class AnimatedStatus {
   }
 
   load() {
+    this.animation = this.getData("animation") || [];
+    this.timeout = this.getData("timeout") || this.kMinTimeout;
+    this.randomize = this.getData("randomize") || false;
+
     this.modules = this.modules || (() => {
       let m = [];
       webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
@@ -45,6 +32,11 @@ class AnimatedStatus {
       }]);
       return m;
     })();
+
+    this.status = {
+      authToken: this.modules.find(m => m.exports?.default?.getToken !== void 0).exports.default.getToken(),
+      currentUser: this.modules.find(m => m.exports?.default?.getCurrentUser !== void 0).exports.default.getCurrentUser()
+    };
   }
 
   start() {
