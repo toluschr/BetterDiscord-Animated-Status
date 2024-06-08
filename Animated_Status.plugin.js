@@ -229,8 +229,7 @@ class AnimatedStatus {
 
     actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
 
-    const save = actions.appendChild(GUI.newButton("Save"));
-    GUI.setSuggested(save, true);
+    const save = actions.appendChild(GUI.setSuggested(GUI.newButton("Save")));
     save.onclick = () => {
       try {
         this.setData("randomize", this.randomize);
@@ -281,7 +280,8 @@ class AnimatedStatus {
 const GUI = {
   newInput: (text = "", placeholder = "") => {
     const input = document.createElement("input");
-    input.className = "inputDefault__80165 input_d266e7";
+    input.className = "bd-select";
+    input.style.paddingLeft = "5px";
     input.value = String(text);
     input.placeholder = String(placeholder);
     return input;
@@ -301,16 +301,16 @@ const GUI = {
 
   newLabel: (text = "") => {
     const label = document.createElement("h5");
-    label.className = "h5__884a2 eyebrow_b7df6b";
+    label.className = "bd-settings-title bd-settings-group-title";
     label.innerText = String(text);
     return label;
   },
 
   newButton: (text, filled = true) => {
     const button = document.createElement("button");
-    button.className = "button_afdfd9 colorBrand_b2253e sizeMedium_c6fa98 grow__4c8a4";
-    if (filled) button.classList.add("lookFilled__19298");
-    else button.classList.add("lookOutlined__46d54");
+    button.className = "bd-button bd-addon-button";
+    if (filled) button.classList.add("bd-button-filled");
+    else button.classList.add("bd-button-outlined");
     button.innerText = String(text);
     return button;
   },
@@ -337,14 +337,14 @@ const GUI = {
   },
 
   setSuggested: (element, value = true) => {
-    if (value) element.classList.add("colorGreen__5f181");
-    else element.classList.remove("colorGreen__5f181");
+    if (value) element.classList.add("bd-button-color-green");
+    else element.classList.remove("bd-button-color-green");
     return element;
   },
 
   setDestructive: (element, value = true) => {
-    if (value) element.classList.add("colorRed_d6b062");
-    else element.classList.remove("colorRed_d6b062");
+    if (value) element.classList.add("bd-button-color-red");
+    else element.classList.remove("bd-button-color-red");
     return element;
   }
 };
