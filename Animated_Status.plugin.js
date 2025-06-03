@@ -25,15 +25,26 @@ class AnimatedStatus {
     this.timeout = this.getData("timeout") || this.kMinTimeout;
     this.randomize = this.getData("randomize") || false;
 
+    // https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/webpackmodules.js#L445
+    //
+    // Seems to load before the Module that exports getToken, so BdApi.Webpack can't be used
+    this.modules = this.modules || (() => {
+      let m = [];
+      webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
+        m = m.concat(Object.values(e.c || {}));
+      }]);
+      return m;
+    })();
+
     this.status = {
-      authToken: (() => {
+      authToken: this.modules.find(m => m.exports?.default?.getToken?.name === "getToken").exports.default.getToken() || (() => {
         let proxy = document.createElement("iframe")
         document.body.appendChild(proxy)
         let token = Object.assign({}, proxy.contentWindow).window.localStorage["token"]
         document.body.removeChild(proxy)
         return JSON.parse(token)
       })(),
-      currentUser: BdApi.Webpack.getByKeys("getCurrentUser").getCurrentUser()
+      currentUser: this.modules.find(m => m.exports?.default?.getCurrentUser?.name === "getCurrentUser").exports.default.getCurrentUser(),
     };
   }
 
