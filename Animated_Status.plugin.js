@@ -1,29 +1,25 @@
-//META{"name":"AnimatedStatus","source":"https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js","website":"https://github.com/toluschr/BetterDiscord-Animated-Status"}*//
+/**
+ * @name AnimatedStatus
+ * @author toluschr, SirSlender
+ * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
+ * @description Animate your Discord Status with this BetterDiscord Plugin
+ * @updateUrl https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
+ * @website https://github.com/toluschr/BetterDiscord-Animated-Status
+ * @version 0.14
+ */
 
 class AnimatedStatus {
-  constructor() {
+  constructor(meta) {
+    this.meta = meta
     this.kSpacing = "15px";
     this.kMinTimeout = 2900;
     this.cancel = undefined;
   }
 
-  getName() { return "Animated Status"; }
-  getVersion() { return "0.13.3"; }
-  getAuthor() { return "toluschr, SirSlender"; }
-  getDescription() { return "Animate your Discord status"; }
-
-  setData(key, value) {
-    BdApi.setData("AnimatedStatus", key, value);
-  }
-
-  getData(key) {
-    return BdApi.getData("AnimatedStatus", key);
-  }
-
   load() {
-    this.animation = this.getData("animation") || [];
-    this.timeout = this.getData("timeout") || this.kMinTimeout;
-    this.randomize = this.getData("randomize") || false;
+    this.animation = BdApi.Data.load(this.meta.name, "animation") || [];
+    this.timeout = BdApi.Data.load(this.meta.name, "timeout") || this.kMinTimeout;
+    this.randomize = BdApi.Data.load(this.meta.name, "randomize") || false;
 
     // https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/webpackmodules.js#L445
     //
@@ -238,9 +234,9 @@ class AnimatedStatus {
     const save = actions.appendChild(GUI.setSuggested(GUI.newButton("Save")));
     save.onclick = () => {
       try {
-        this.setData("randomize", this.randomize);
-        this.setData("timeout", parseInt(timeout.value));
-        this.setData("animation", this.jsonFromEditor(edit));
+        BdApi.Data.store(this.meta.name, "randomize", this.randomize);
+        BdApi.Data.store(this.meta.name, "timeout", parseInt(timeout.value));
+        BdApi.Data.store(this.meta.name, "animation", this.jsonFromEditor(edit));
       } catch (e) {
         BdApi.showToast(e, { type: "error" });
         return;
