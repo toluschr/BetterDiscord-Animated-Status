@@ -1,11 +1,10 @@
 /**
  * @name AnimatedStatus
  * @author toluschr, SirSlender
- * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
  * @description Animate your Discord Status with this BetterDiscord Plugin
- * @updateUrl https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
- * @website https://github.com/toluschr/BetterDiscord-Animated-Status
  * @version 0.14
+ * @website https://github.com/toluschr/BetterDiscord-Animated-Status
+ * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
  */
 
 class AnimatedStatus {
