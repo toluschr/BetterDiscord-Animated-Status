@@ -2,7 +2,7 @@
  * @name AnimatedStatus
  * @author toluschr, SirSlender
  * @description Animate your Discord Status with this BetterDiscord Plugin
- * @version 0.14
+ * @version 0.15
  * @website https://github.com/toluschr/BetterDiscord-Animated-Status
  * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
  */
@@ -45,7 +45,10 @@ class AnimatedStatus {
 
   start() {
     if (this.animation.length === 0) {
-      BdApi.showToast("Animated Status: No status set. Go to Settings>Plugins to set a custom animation!");
+      BdApi.UI.showToast(
+        "Animated Status: No status set. Go to Settings>Plugins to set a custom animation!",
+        { type: "info" }
+      );
     } else {
       this.animationLoop();
     }
@@ -77,7 +80,7 @@ class AnimatedStatus {
     try {
       return eval(text.substr(evalPrefix.length));
     } catch (e) {
-      BdApi.showToast(e, { type: "error" });
+      BdApi.UI.showToast(e, { type: "error" });
       return "";
     }
   }
@@ -259,7 +262,7 @@ class AnimatedStatus {
     req.onload = () => {
       const err = this.strError(req);
       if (err !== undefined)
-        BdApi.showToast(`Animated Status: Error: ${err}`, { type: "error" });
+        BdApi.UI.showToast(`Animated Status: Error: ${err}`, { type: "error" });
     };
     if (status === {}) status = null;
     req.send(JSON.stringify({ custom_status: status }));
@@ -294,7 +297,7 @@ const GUI = {
     out.addEventListener("focusout", () => {
       if (parseInt(out.value) < minimum) {
         out.value = String(minimum);
-        BdApi.showToast(`Value must not be lower than ${minimum}`, { type: "error" });
+        BdApi.UI.showToast(`Value must not be lower than ${minimum}`, { type: "error" });
       }
     });
     return out;
