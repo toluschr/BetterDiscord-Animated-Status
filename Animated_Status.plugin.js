@@ -2,7 +2,7 @@
  * @name AnimatedStatus
  * @author toluschr, SirSlender
  * @description Animate your Discord Status with this BetterDiscord Plugin
- * @version 0.15
+ * @version 0.15.1
  * @website https://github.com/toluschr/BetterDiscord-Animated-Status
  * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
  */
@@ -236,15 +236,15 @@ class AnimatedStatus {
     const save = actions.appendChild(GUI.setSuggested(GUI.newButton("Save")));
     save.onclick = () => {
       try {
-        BdApi.Data.store(this.meta.name, "randomize", this.randomize);
-        BdApi.Data.store(this.meta.name, "timeout", parseInt(timeout.value));
-        BdApi.Data.store(this.meta.name, "animation", this.jsonFromEditor(edit));
+        BdApi.Data.save(this.meta.name, "randomize", this.randomize);
+        BdApi.Data.save(this.meta.name, "timeout", parseInt(timeout.value));
+        BdApi.Data.save(this.meta.name, "animation", this.jsonFromEditor(edit));
       } catch (e) {
-        BdApi.showToast(e, { type: "error" });
+        BdApi.UI.showToast(e, { type: "error" });
         return;
       }
 
-      BdApi.showToast("Settings were saved!", { type: "success" });
+      BdApi.UI.showToast("Settings were saved!", { type: "success" });
 
       this.stop();
       this.load();
