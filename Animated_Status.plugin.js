@@ -2,7 +2,7 @@
  * @name AnimatedStatus
  * @author toluschr, SirSlender
  * @description Animate your Discord Status with this BetterDiscord Plugin
- * @version 0.15.1
+ * @version 0.15.2
  * @website https://github.com/toluschr/BetterDiscord-Animated-Status
  * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
  */
@@ -24,11 +24,11 @@ class AnimatedStatus {
     //
     // Seems to load before the Module that exports getToken, so BdApi.Webpack can't be used
     this.modules = this.modules || (() => {
-      let m = [];
-      webpackChunkdiscord_app.push([['AnimatedStatus'], {}, e => {
-        m = m.concat(Object.values(e.c || {}));
-      }]);
-      return m;
+        let m = [];
+        webpackChunkdiscord_app.push([[`AnimatedStatus-${Math.random()}`], {}, e => {
+	    m = m.concat(Object.values(e.c || {}));
+        }]);
+        return m;
     })();
 
     this.status = {
