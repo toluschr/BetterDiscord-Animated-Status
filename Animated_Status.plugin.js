@@ -222,18 +222,18 @@ class AnimatedStatus {
 
     const actions = settings.appendChild(GUI.newHBox());
 
-    const addStep = actions.appendChild(GUI.setSuggested(GUI.newButton("+", false)));
+    const addStep = actions.appendChild(GUI.newButton("+"));
     addStep.title = "Add step to end";
     addStep.onclick = () => edit.appendChild(this.newEditorRow());
 
-    const delStep = actions.appendChild(GUI.setDestructive(GUI.newButton("-", false)));
+    const delStep = actions.appendChild(GUI.newButton("-"));
     delStep.title = "Remove last step";
     delStep.style.marginLeft = this.kSpacing;
     delStep.onclick = () => edit.removeChild(edit.childNodes[edit.childNodes.length - 1]);
 
     actions.appendChild(GUI.setExpand(document.createElement("div"), 2));
 
-    const save = actions.appendChild(GUI.setSuggested(GUI.newButton("Save")));
+    const save = actions.appendChild(GUI.newButton("Save"));
     save.onclick = () => {
       try {
         BdApi.Data.save(this.meta.name, "randomize", this.randomize);
@@ -310,11 +310,9 @@ const GUI = {
     return label;
   },
 
-  newButton: (text, filled = true) => {
+  newButton: (text) => {
     const button = document.createElement("button");
-    button.className = "bd-button bd-addon-button";
-    if (filled) button.classList.add("bd-button-filled");
-    else button.classList.add("bd-button-outlined");
+    button.className = "bd-button bd-button-color-brand bd-button-filled";
     button.innerText = String(text);
     return button;
   },
@@ -339,16 +337,4 @@ const GUI = {
     element.style.flexGrow = value;
     return element;
   },
-
-  setSuggested: (element, value = true) => {
-    if (value) element.classList.add("bd-button-color-green");
-    else element.classList.remove("bd-button-color-green");
-    return element;
-  },
-
-  setDestructive: (element, value = true) => {
-    if (value) element.classList.add("bd-button-color-red");
-    else element.classList.remove("bd-button-color-red");
-    return element;
-  }
 };
