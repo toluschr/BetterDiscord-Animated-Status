@@ -2,7 +2,7 @@
  * @name AnimatedStatus
  * @author toluschr, SirSlender
  * @description Animate your Discord Status with this BetterDiscord Plugin
- * @version 0.15.2
+ * @version 0.15.3
  * @website https://github.com/toluschr/BetterDiscord-Animated-Status
  * @source https://raw.githubusercontent.com/toluschr/BetterDiscord-Animated-Status/master/Animated_Status.plugin.js
  */
@@ -11,7 +11,7 @@ class AnimatedStatus {
   constructor(meta) {
     this.meta = meta
     this.kSpacing = "15px";
-    this.kMinTimeout = 2900;
+    this.kMinTimeout = 10000;
     this.cancel = undefined;
   }
 
@@ -209,7 +209,7 @@ class AnimatedStatus {
     const settings = document.createElement("div");
     settings.style.padding = "10px";
 
-    settings.appendChild(GUI.newLabel("Step-Duration (3000: 3 seconds, 3500: 3.5 seconds, ...), overwritten by individual steps"));
+    settings.appendChild(GUI.newLabel("Step-Duration (30500: 30.5 seconds, ...), overwritten by individual steps"));
     const timeout = settings.appendChild(GUI.newNumericInput(this.timeout, this.kMinTimeout));
     timeout.style.marginBottom = this.kSpacing;
 
@@ -271,6 +271,7 @@ class AnimatedStatus {
   strError(req) {
     if (req.status < 400) return undefined;
     if (req.status === 401) return "Invalid AuthToken";
+    if (req.status === 429) return "Discord rejected status update. Your timeout is too low.";
 
     let json = JSON.parse(req.response);
     for (const s of ["errors", "custom_status", "text", "_errors", 0, "message"])
