@@ -339,3 +339,5 @@ const GUI = {
     return element;
   },
 };
+
+module.exports = AnimatedStatus;
